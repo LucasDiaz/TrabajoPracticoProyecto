@@ -1,0 +1,6 @@
+@TP1_Menu_LucasDiaz_HostAddress = http://localhost:5020
+
+GET {{TP1_Menu_LucasDiaz_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

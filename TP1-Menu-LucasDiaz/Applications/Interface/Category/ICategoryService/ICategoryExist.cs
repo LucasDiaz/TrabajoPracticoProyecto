@@ -1,0 +1,13 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Applications.Interface.Category.ICategoryService
+{
+    public interface ICategoryExist
+    {
+        Task<bool> CategoryExists(int categoryId);
+    }
+}
