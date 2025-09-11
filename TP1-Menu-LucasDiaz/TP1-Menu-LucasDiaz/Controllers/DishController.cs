@@ -102,35 +102,38 @@ namespace TP1_Menu_LucasDiaz.Controllers
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Search(
             [FromQuery] string? name,
-            [FromQuery] int? categoryId,
-            [FromQuery] OrderPrice? orderPrice = OrderPrice.ASC,
-            [FromQuery] bool onlyActive = true)
+            [FromQuery] int? category,
+            [FromQuery] OrderPrice? sortByPrice = OrderPrice.ASC,
+            [FromQuery] bool? onlyActive = null)
         {
 
             
-            var list = await _dishGetAllAsync.SearchAsync(name, categoryId, orderPrice);
 
-            if (categoryId != 0)
-            {
-                var categoryExists = await _categoryExist.CategoryExists(categoryId.Value);
-                if (!categoryExists)
-                {
-                    return BadRequest(new ApiError("Required CategoryId."));
-                }
-            }
+            //if (category != 0)
+            //{
+            //    var categoryExists = await _categoryExist.CategoryExists(category.Value);
+            //    if (!categoryExists)
+            //    {
+            //        return BadRequest(new ApiError("Required CategoryId."));
+            //    }
+            //}
+            
+            var list = await _dishGetAllAsync.SearchAsync(name, category, sortByPrice);
             if (list == null || !list.Any())
             {
                 return NotFound(new ApiError("No dishes found matching the criteria."));
             }
-            if (onlyActive)
+            if (onlyActive != null)
             {
-                list = list.Where(d => d.isActive);
+                if (onlyActive == true )
+                {
+                    list = list.Where(d => d.isActive);
+                }
+                if (onlyActive == false)
+                {
+                    list = list.Where(d => d.isActive == false);
+                }
             }
-            if (!onlyActive)
-            {
-                list = list.Where(d => d.isActive == false);
-            }
-
             return Ok(list);
 
         }
