@@ -21,8 +21,9 @@ namespace TP1_Menu_LucasDiaz.Controllers
         private readonly ICategoryExist _categoryExist;
         private readonly IDishExistName _dishExistName;
         private readonly IDishExistId _dishExistId;
+        private readonly IDishGetById _dishGetById;
 
-        public DishController(IDishCreate dishCreate, IDishGetAllAsync dishGetAllAsync, IDishUpdate dishUpdate, ICategoryExist categoryExist, IDishExistName dishExistName, IDishExistId dishExistId)
+        public DishController(IDishCreate dishCreate, IDishGetAllAsync dishGetAllAsync, IDishUpdate dishUpdate, ICategoryExist categoryExist, IDishExistName dishExistName, IDishExistId dishExistId, IDishGetById dishGetById)
         {
             _dishCreate = dishCreate;
             _dishGetAllAsync = dishGetAllAsync;
@@ -30,6 +31,7 @@ namespace TP1_Menu_LucasDiaz.Controllers
             _categoryExist = categoryExist;
             _dishExistName = dishExistName;
             _dishExistId = dishExistId;
+            _dishGetById = dishGetById;
         }
 
 
@@ -80,9 +82,30 @@ namespace TP1_Menu_LucasDiaz.Controllers
             {
                 return Conflict(new ApiError("A dish with this name already exists."));
             }
-            return CreatedAtAction(nameof(Search), new { id = createdDish.Id }, createdDish);
+            return CreatedAtAction(nameof(GetDishById), new { id = createdDish.Id }, createdDish);
 
         }
+
+        //GET by ID
+        /// <summary>
+        /// Obtiene un plato por su ID.
+        /// </summary>
+        /// <remarks>
+        /// Busca un plato específico en el menú usando su identificador único.
+        /// </remarks>
+        [HttpGet("{id}")]
+        [SwaggerOperation(
+        Summary = "Buscar platos por ID",
+        Description = "Buscar platos por ID."
+        )]
+        [ProducesResponseType(typeof(DishResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetDishById(Guid id)
+        {
+            var dish = await _dishGetById.GetDishById(id);
+            return Ok(dish);
+        }
+
         // GETs
         // GET with filters
         /// <summary>
@@ -209,5 +232,8 @@ namespace TP1_Menu_LucasDiaz.Controllers
         }
 
         // DELETE
+
+
+
     }
 }

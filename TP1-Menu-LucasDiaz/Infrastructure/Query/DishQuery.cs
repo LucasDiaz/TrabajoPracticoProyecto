@@ -47,7 +47,7 @@ namespace Infrastructure.Query
             return await query
                     .Include(d => d.Category)
                     .ToListAsync();
-            
+
 
         }
 
@@ -64,6 +64,9 @@ namespace Infrastructure.Query
         {
             return await _context.Dishes.AnyAsync(d => d.Name == name);
         }
+
+
+
     }
 }
 

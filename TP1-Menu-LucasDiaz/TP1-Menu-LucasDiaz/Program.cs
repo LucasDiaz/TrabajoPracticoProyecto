@@ -12,6 +12,12 @@ using Applications.Interface.Dish.IDishService;
 using Applications.UseCase.DishService;
 using Applications.Interface.Category.ICategoryService;
 using Applications.UseCase.CategoryService;
+using Applications.Interface.Order;
+using Applications.Interface.Order.IOrder;
+using Applications.UseCase.Order;
+using Applications.Interface.DeliveryType;
+using Applications.Interface.IOrderItem;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +38,9 @@ builder.Services.AddScoped<IDishUpdate, DishUpdate>();
 builder.Services.AddScoped<IDishGetAllAsync, DishGetAllAsync>();
 builder.Services.AddScoped<IDishExistId, DishExistId>();
 builder.Services.AddScoped<IDishExistName, DishExistName>();
+builder.Services.AddScoped<IDishDelete, DishDelete>();
+builder.Services.AddScoped<IDishGetById, DishGetById>();
+//builder.Services.AddScoped<IDishCategory, DishCategory>();
 
 //builder Query
 builder.Services.AddScoped<ICategoryQuery, CategoryQuery>();
@@ -39,6 +48,26 @@ builder.Services.AddScoped<ICategoryCommand, CategoryCommand>();
 //builder CategoryUseCase
 builder.Services.AddScoped<ICategoryGetById, CategoryGetById>();
 builder.Services.AddScoped<ICategoryExist, CategoryExist>();
+builder.Services.AddScoped<ICategoryGetAll, CategoryGetAll>();
+
+//builder Order
+builder.Services.AddScoped<IOrderCommand, OrderCommand>();
+builder.Services.AddScoped<IOrderQuery, OrderQuery>();
+//builder OrderUseCase
+builder.Services.AddScoped<IOrderCreate, OrderCreate>();
+builder.Services.AddScoped<IOrderGetById, OrderGetById>();
+builder.Services.AddScoped<IOrderGetAllAsync, OrderGetAllAsync>();
+builder.Services.AddScoped<IUpdateItemFromOrder, UpdateItemFromOrder>();
+builder.Services.AddScoped<IUpdateOrderItemStatus, UpdateOrderItemStatus>();
+
+
+//builder DeliveryType
+builder.Services.AddScoped<IDeliveryTypeQuery, DeliveryTypeQuery>();
+
+//builder OrderItem
+builder.Services.AddScoped<IOrderItemCommand, OrderItemCommand>();
+builder.Services.AddScoped<IOrderItemQuery, OrderItemQuery>();
+
 
 //
 builder.Services.AddControllers();
