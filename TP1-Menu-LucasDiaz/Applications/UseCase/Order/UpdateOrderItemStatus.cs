@@ -1,7 +1,11 @@
-﻿using Applications.Interface.Order;
+﻿using Applications.Exceptions;
+using Applications.Interface.IOrderItem;
+using Applications.Interface.Order;
 using Applications.Interface.Order.IOrder;
+using Applications.Interface.Status;
 using Applications.Models.Request;
 using Applications.Models.Response;
+using Azure.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,25 +18,38 @@ namespace Applications.UseCase.Order
     {
         private readonly IOrderCommand _ordercommand;
         private readonly IOrderQuery _orderQuery;
+        private readonly IOrderItemQuery _orderItemQuery;
+        private readonly IStatusQuery _statusQuery;
 
-        public UpdateOrderItemStatus(IOrderCommand orderCommand, IOrderQuery orderQuery)
+        public UpdateOrderItemStatus(IOrderCommand ordercommand, IOrderQuery orderQuery, IOrderItemQuery orderItemQuery, IStatusQuery statusQuery)
         {
-            _ordercommand = orderCommand;
+            _ordercommand = ordercommand;
             _orderQuery = orderQuery;
+            _orderItemQuery = orderItemQuery;
+            _statusQuery = statusQuery;
         }
 
         public async Task<OrderUpdateReponse> UpdateItemStatus(long orderId, int itemId, OrderItemUpdateRequest request)
         {
             // 1. Buscar la orden
             var order = await _orderQuery.GetOrderById(orderId);
-            if (order == null)
-                throw new Exception("Order not found");
-
-            // 2. Buscar el item dentro de la orden
+            if (order == null) { 
+                //404
+            throw new OrderNotFoundException(orderId);
+            }
+        
+            // 2. Buscar el item dentro de la orden 
             var item = order.OrderItems.FirstOrDefault(i => i.OrderItemId == itemId);
-            if (item == null)
-                throw new Exception("Item not found in the order");
+            if (item == null) {  
+                //404
+                throw new OrderItemNotFoundException(orderId,itemId); 
+            }
 
+            if (await _statusQuery.StatusExist(request.status))
+            {
+                // Usamos BadRequestException para el 400 - Estado inválido
+                throw new InvalidStatusException(request.status);
+            }
             // 3. Actualizar estado del ítem
             item.StatusId = request.status;
 

@@ -27,5 +27,10 @@ namespace Infrastructure.Query
         {
             return await _context.DeliveryTypes.FindAsync(id).AsTask();
         }
+
+        public async Task<bool> ExistDeliveryTypeById(int id)
+        {
+            return await _context.DeliveryTypes.AnyAsync(d => d.Id == id);
+        }
     }
 }

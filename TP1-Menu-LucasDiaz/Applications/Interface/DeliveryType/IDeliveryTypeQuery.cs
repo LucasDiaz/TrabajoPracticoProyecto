@@ -10,5 +10,6 @@ namespace Applications.Interface.DeliveryType
     {
         Task<List<Domain.Entities.DeliveryType>> GetAllDeliveryTypes();
         Task<Domain.Entities.DeliveryType?> GetDeliveryTypeById(int id);
+        Task<bool> ExistDeliveryTypeById(int id);
     }
 }

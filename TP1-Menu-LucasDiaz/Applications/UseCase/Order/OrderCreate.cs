@@ -1,17 +1,18 @@
-﻿using Applications.Interface.Order;
+﻿using Applications.Exceptions;
+using Applications.Interface.DeliveryType;
+using Applications.Interface.Dish;
+using Applications.Interface.IOrderItem;
+using Applications.Interface.Order;
 using Applications.Interface.Order.IOrder;
 using Applications.Models.Request;
 using Applications.Models.Response;
 using Azure;
+using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Domain.Entities;
-using Applications.Interface.DeliveryType;
-using Applications.Interface.Dish;
-using Applications.Interface.IOrderItem;
 
 namespace Applications.UseCase.Order
 {
@@ -36,9 +37,20 @@ namespace Applications.UseCase.Order
 
         public async Task<OrderCreateResponse?> CreateOrder(OrderRequest orderRequest)
         {
+            if (orderRequest.Delivery == null || orderRequest.Delivery.id <= 0)
+            {
+                throw new MissingDeliveryTypeException();
+            }
+
 
             //crear order
             var deliveryType = await _deliveryTypeQuery.GetDeliveryTypeById(orderRequest.Delivery.id);
+
+            if (deliveryType == null)
+            {
+                throw new MissingDeliveryTypeException();
+            }
+
             var order = new Domain.Entities.Order
             {
                 DeliveryTypeId = orderRequest.Delivery.id,
@@ -53,6 +65,19 @@ namespace Applications.UseCase.Order
             await _command.InsertOrder(order);
             //crear orderItem
             var listItems = orderRequest.Items;
+            foreach (var item in listItems)
+            {
+                var dish = await _dishQuery.GetDishById(item.Id);
+                if (dish == null)
+                {
+                    throw new InvalidDishException(item.Id);
+                }
+                if (item.quantity <= 0)
+                {
+                    throw new InvalidQuantityException(item.Id);
+                }
+            }
+
             var listorderItems = listItems.Select(item => new OrderItem
             {
                 DishId = item.Id,
@@ -83,6 +108,14 @@ namespace Applications.UseCase.Order
             foreach (var item in orderItems)
             {
                 var dish = await _dishQuery.GetDishById(item.Id);
+                if (dish == null)
+                {
+                    throw new InvalidDishException(item.Id);
+                }
+                if (item.quantity <= 0)
+                {
+                    throw new InvalidQuantityException(item.Id);
+                }
                 total += dish.Price * item.quantity;
             }
             return total;

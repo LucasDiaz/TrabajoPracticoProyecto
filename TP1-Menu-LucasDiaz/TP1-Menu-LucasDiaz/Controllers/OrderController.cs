@@ -1,7 +1,9 @@
-﻿using Applications.Interface.Order.IOrder;
+﻿using Applications.Exceptions;
+using Applications.Interface.Order.IOrder;
 using Applications.Models.Request;
 using Applications.Models.Response;
 using Applications.UseCase.Order;
+using Azure.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -28,15 +30,6 @@ namespace TP1_Menu_LucasDiaz.Controllers
             _updateOrderItemStatus = updateOrderItemStatus;
         }
 
-
-
-
-
-
-
-
-
-
         // POST
         /// <summary>
         /// Crear nueva orden.
@@ -50,17 +43,16 @@ namespace TP1_Menu_LucasDiaz.Controllers
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateOrder([FromBody] OrderRequest orderRequest)
         {
+
             try
             {
-                var result = await _OrderCreate.CreateOrder(orderRequest);
-
-                return CreatedAtAction(nameof(CreateOrder), new { id = result.orderNumber }, result);
-
+                var response = await _OrderCreate.CreateOrder(orderRequest);
+                return StatusCode(201, response); // HTTP 201 Created
             }
-            catch (Exception ex)
+            catch (ApplicationValidationException ex)
             {
-                Console.WriteLine(ex.Message);
-                return BadRequest(new ApiError("An error occurred while processing the request."));
+                // Captura  (InvalidDishException, InvalidQuantityException, MissingDeliveryTypeException)
+                return BadRequest(new { message = ex.Message }); // HTTP 400 Bad Request
             }
         }
 
@@ -79,20 +71,19 @@ namespace TP1_Menu_LucasDiaz.Controllers
         public async Task<IActionResult> GetOrders([FromQuery] int? statusId, [FromQuery] DateTime? from, [FromQuery] DateTime? to)
         {
             //sacar try
+
             try
             {
-                var result = await _OrderGetAllAsync.GetOrderWithFilter(statusId, from, to);
-                if (result == null || !result.Any())
-                {
-                    return NotFound(new ApiError("No orders found with the specified filters."));
-                }
-                return Ok(result);
+                var orders = await _OrderGetAllAsync.GetOrderWithFilter(statusId, from, to);
+                return Ok(orders); // HTTP 200 OK con la lista de órdenes
             }
-            catch (Exception ex)
+            catch (ApplicationValidationException ex)
             {
-                Console.WriteLine(ex.Message);
-                return BadRequest(new ApiError("An error occurred while processing the request."));
+                // Capturamos la excepción lanzada en el servicio.
+                // Un 404 es apropiado cuando no se encuentran recursos.
+                return NotFound(new { message = ex.Message });
             }
+           
         }
 
         //GET by ID
@@ -107,31 +98,69 @@ namespace TP1_Menu_LucasDiaz.Controllers
         Summary = "Buscar orders por ID",
         Description = "Buscar orders por ID."
         )]
-        [ProducesResponseType(typeof(DishResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(OrderDetailsResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetOrderById(long id)
         {
-            var order = await _OrderGetById.GetOrderById(id);
-            //if (dish == null)
-            //{
-            //    throw new NotFoundException($"Order with ID {id} not found.");
-            //}
-            return Ok(order);
+            try
+            {
+                var order = await _OrderGetById.GetOrderById(id);
+
+                return Ok(order); // HTTP 200 OK
+            }
+            catch (ApplicationValidationException ex)
+            {
+                // Capturamos la InvalidOperationException lanzada por el servicio
+                // y la mapeamos al código HTTP 404 Not Found.
+                return NotFound(new { message = ex.Message });
+            }
         }
         // PUT to update order items
         [HttpPut("{orderId}")]
+        [ProducesResponseType(typeof(OrderUpdateReponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> UpdateOrderItems(long orderId, [FromBody] OrderUpdateRequest request)
         {
+            try { 
             var response = await _updateItemFromOrder.UpdateItemQuantity(orderId, request);
-            return Ok(response);
+            return Ok(response); }
+            catch (OrderNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (ApplicationValidationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+
         }
         // PATCH: api/v1/order/1001/item/1
         [HttpPatch("{orderId}/item/{itemId}")]
+        [ProducesResponseType(typeof(OrderUpdateReponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
         //aplicar
         public async Task<IActionResult> UpdateOrderItemStatus(long orderId, int itemId, [FromBody] OrderItemUpdateRequest request)
         {
+            try { 
             var response = await _updateOrderItemStatus.UpdateItemStatus(orderId, itemId, request);
             return Ok(response);
+            }
+            catch (OrderNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (OrderItemNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (ApplicationValidationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+
+
         }
     }
 }

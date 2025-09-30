@@ -17,6 +17,7 @@ using Applications.Interface.Order.IOrder;
 using Applications.UseCase.Order;
 using Applications.Interface.DeliveryType;
 using Applications.Interface.IOrderItem;
+using Applications.Interface.Status;
 
 
 
@@ -67,6 +68,9 @@ builder.Services.AddScoped<IDeliveryTypeQuery, DeliveryTypeQuery>();
 //builder OrderItem
 builder.Services.AddScoped<IOrderItemCommand, OrderItemCommand>();
 builder.Services.AddScoped<IOrderItemQuery, OrderItemQuery>();
+
+//builder status
+builder.Services.AddScoped<IStatusQuery, StatusQuery>();
 
 
 //

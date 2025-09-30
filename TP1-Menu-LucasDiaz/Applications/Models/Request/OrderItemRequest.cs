@@ -1,6 +1,7 @@
 ﻿using Domain.Entities;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,7 +10,7 @@ namespace Applications.Models.Request
 {
     public class OrderItemRequest
     {
-      
+        //[Required(ErrorMessage = "La cantidad es requerida .")]
         public int Quantity { get; set; }
         public string Notes { get; set; }
         public DateTime CreateDate { get; set; }

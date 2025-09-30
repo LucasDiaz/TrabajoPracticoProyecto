@@ -14,24 +14,37 @@ namespace Applications.UseCase.Order
     public class OrderGetAllAsync :IOrderGetAllAsync
     {
         private readonly IOrderQuery _query;
-        private readonly IStatusQuery _statusQuery;
-        private readonly IDeliveryTypeQuery _deliveryTypeQuery;
 
-        public OrderGetAllAsync(IOrderQuery query, IStatusQuery statusQuery, IDeliveryTypeQuery deliveryTypeQuery)
+        public OrderGetAllAsync(IOrderQuery query)
         {
             _query = query;
-            _statusQuery = statusQuery;
-            _deliveryTypeQuery = deliveryTypeQuery;
         }
+
+        //private readonly IStatusQuery _statusQuery;
+        //private readonly IDeliveryTypeQuery _deliveryTypeQuery;
+
+        //public OrderGetAllAsync(IOrderQuery query, IStatusQuery statusQuery, IDeliveryTypeQuery deliveryTypeQuery)
+        //{
+        //    _query = query;
+        //    _statusQuery = statusQuery;
+        //    _deliveryTypeQuery = deliveryTypeQuery;
+        //}
 
         public async Task<IEnumerable<OrderDetailsResponse?>> GetOrderWithFilter(int? statusId, DateTime? from, DateTime? to)
         {
+           
             var orders = await _query.GetOrderWithFilter(statusId, from, to);
 
             if (orders == null || !orders.Any())
             {
-                return Enumerable.Empty<OrderDetailsResponse?>();
+                // Lanzamos la excepción con un mensaje claro.
+                throw new Applications.Exceptions.InvalidOperationException("No se encontraron órdenes con los filtros especificados.");
             }
+
+            //if (orders == null || !orders.Any())
+            //{
+            //    return Enumerable.Empty<OrderDetailsResponse?>();
+            //}
 
             var orderResponses = orders.Select(order =>
             new OrderDetailsResponse

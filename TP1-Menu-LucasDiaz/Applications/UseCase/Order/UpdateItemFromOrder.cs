@@ -1,4 +1,5 @@
-﻿using Applications.Interface.Dish;
+﻿using Applications.Exceptions;
+using Applications.Interface.Dish;
 using Applications.Interface.IOrderItem;
 using Applications.Interface.Order;
 using Applications.Interface.Order.IOrder;
@@ -36,15 +37,23 @@ namespace Applications.UseCase.Order
             var order = await _query.GetOrderById(orderId);
             if (order == null)
             {
-                throw new Exception("");
+                // **Excepción 404: Orden no encontrada**
+                throw new OrderNotFoundException(orderId);
             }
 
             //2. no se puede modificar si no está 'Pending'
             if (order.OverallStatus.Id != 1)
             {
-                throw new Exception("");
+                // **Excepción 400: Estado no modificable**
+                string currentStatusName = order.OverallStatus?.Name ?? "Desconocido";
+                throw new InvalidOrderStatusException(currentStatusName);
             }
             //3. borrar todos los items de la orden
+            if (listItems.items == null || !listItems.items.Any())
+            {
+                // **Excepción 400: Lista de ítems vacía**
+                throw new Applications.Exceptions.InvalidOperationException("La orden debe contener al menos un plato.");
+            }
             await _OrderItemCommand.RemoveOrderItem(order.OrderItems);
             //4. crear los nuevos items
             var newOrderItems = listItems.items.Select(item => new OrderItem
@@ -62,10 +71,18 @@ namespace Applications.UseCase.Order
             foreach (var item in newOrderItems)
             {
                 var dish = await _DishQuery.GetDishById(item.DishId);
-                if (dish != null)
-                {
-                    totalPrice += dish.Price * item.Quantity;
+                //var dish = await _dishQuery.GetDishById(item.Id);
+                if (dish == null || !dish.Available)
+                {   // **Excepción 400: Plato no válido**
+                    throw new InvalidDishException(item.DishId);
                 }
+                if (item.Quantity <= 0)
+                {// **Excepción 400: Plato no válido**
+                    throw new InvalidQuantityException(item.DishId);
+                }
+ 
+                    totalPrice += dish.Price * item.Quantity;
+               
             }
             //7. actualizar la orden
             order.Price = totalPrice;

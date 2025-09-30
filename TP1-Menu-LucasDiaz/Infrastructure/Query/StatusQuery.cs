@@ -28,5 +28,11 @@ namespace Infrastructure.Query
         {
             return await _context.Statuses.ToListAsync();
         }
+
+        public async Task<bool> StatusExist(int id)
+        {
+            return await _context.Statuses.AnyAsync(d => d.Id == id);
+        }
+
     }
 }

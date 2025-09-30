@@ -10,5 +10,6 @@ namespace Applications.Interface.Status
     {
         Task<string> GetStatusById(int id);
         Task<List<Domain.Entities.Status>> GetAllStatuses();
+        Task<bool> StatusExist(int id);
     }
 }

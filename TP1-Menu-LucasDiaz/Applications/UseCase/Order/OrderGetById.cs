@@ -1,4 +1,5 @@
-﻿using Applications.Interface.Order;
+﻿using Applications.Exceptions;
+using Applications.Interface.Order;
 using Applications.Interface.Order.IOrder;
 using Applications.Models.Response;
 using System;
@@ -19,6 +20,13 @@ namespace Applications.UseCase.Order
         public async Task<OrderDetailsResponse?> GetOrderById(long id)
         {
             var order = await _query.GetOrderById(id);
+
+            if (order == null)
+            {
+                // Si la orden no se encuentra, lanzamos la excepción.
+                throw new OrderNotFoundException(id);
+            }
+
             if (order != null)
             {
                 var orderDetails = new OrderDetailsResponse
