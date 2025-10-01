@@ -72,10 +72,21 @@ namespace Applications.Exceptions
             : base($"No existe el status '{idstatus}'") { }
     }
 
-    // Excepción para 400 Bad Request (Plato no válido/no disponible en el recálculo)
-    public class ItemRecalculationException : ApplicationValidationException
+
+    public class PriceRequeridoException : ApplicationValidationException
     {
-        public ItemRecalculationException(Guid dishId)
-            : base($"El plato con ID '{dishId}' no existe o no está disponible para el recálculo.") { }
+        public PriceRequeridoException(string text)
+            : base(text) { }
     }
+
+    public class NameExitsException : Exception
+    {
+        public NameExitsException(string text)
+            : base(text) { }
+    }
+  
+
+
+
+
 }

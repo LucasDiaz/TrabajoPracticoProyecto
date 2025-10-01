@@ -1,9 +1,11 @@
-﻿using Applications.Enum;    
+﻿using Applications.Enum;
+using Applications.Exceptions;
 using Applications.Interface.Category.ICategoryService;
 using Applications.Interface.Dish.IDishService;
 using Applications.Models.Request;
 using Applications.Models.Response;
 using Applications.UseCase.CategoryService;
+using Azure.Core;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -22,8 +24,9 @@ namespace TP1_Menu_LucasDiaz.Controllers
         private readonly IDishExistName _dishExistName;
         private readonly IDishExistId _dishExistId;
         private readonly IDishGetById _dishGetById;
+        private readonly IDishDelete _deleteDish;
 
-        public DishController(IDishCreate dishCreate, IDishGetAllAsync dishGetAllAsync, IDishUpdate dishUpdate, ICategoryExist categoryExist, IDishExistName dishExistName, IDishExistId dishExistId, IDishGetById dishGetById)
+        public DishController(IDishCreate dishCreate, IDishGetAllAsync dishGetAllAsync, IDishUpdate dishUpdate, ICategoryExist categoryExist, IDishExistName dishExistName, IDishExistId dishExistId, IDishGetById dishGetById, IDishDelete deleteDish)
         {
             _dishCreate = dishCreate;
             _dishGetAllAsync = dishGetAllAsync;
@@ -32,7 +35,10 @@ namespace TP1_Menu_LucasDiaz.Controllers
             _dishExistName = dishExistName;
             _dishExistId = dishExistId;
             _dishGetById = dishGetById;
+            _deleteDish = deleteDish;
         }
+
+
 
 
 
@@ -55,35 +61,24 @@ namespace TP1_Menu_LucasDiaz.Controllers
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateDish([FromBody] DishRequest dishRequest)
         {
-            if (dishRequest == null)
+            try
             {
-                return BadRequest(new ApiError("Required dish data."));
+                var createdDish = await _dishCreate.CreateDish(dishRequest);
+                return CreatedAtAction(nameof(GetDishById), new { id = createdDish.Id }, createdDish);
+                
             }
-            if (string.IsNullOrWhiteSpace(dishRequest.Name))
+            catch (RequeridoException ex)
             {
-                return BadRequest(new ApiError("Name is required."));
+                return BadRequest(new { message = ex.Message });
             }
-            if (dishRequest.Category != 0)
+            catch (ConflictException ex)
             {
-                var categoryExists = await _categoryExist.CategoryExists(dishRequest.Category);
-                if (!categoryExists)
-                {
-                    return BadRequest(new ApiError("Required CategoryId."));
-                }
+                return BadRequest(new { message = ex.Message });
             }
-            if (dishRequest.Price <= 0)
-            {
-                return BadRequest(new ApiError("Price must be greater than zero."));
-            }
+          
 
-            var createdDish = await _dishCreate.CreateDish(dishRequest);
-            
-            if (createdDish == null)
-            {
-                return Conflict(new ApiError("A dish with this name already exists."));
-            }
-            return CreatedAtAction(nameof(GetDishById), new { id = createdDish.Id }, createdDish);
 
+          
         }
 
         //GET by ID
@@ -102,8 +97,15 @@ namespace TP1_Menu_LucasDiaz.Controllers
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetDishById(Guid id)
         {
-            var dish = await _dishGetById.GetDishById(id);
-            return Ok(dish);
+            try {                 
+                var dish = await _dishGetById.GetDishById(id);
+                return Ok(dish);
+            }
+            catch (NullException ex)
+            {
+                return NotFound(new ApiError(ex.Message));
+            }
+         
         }
 
         // GETs
@@ -130,45 +132,34 @@ namespace TP1_Menu_LucasDiaz.Controllers
             [FromQuery] bool? onlyActive = null)
         {
 
-            
 
-            //if (category != 0)
-            //{
-            //    var categoryExists = await _categoryExist.CategoryExists(category.Value);
-            //    if (!categoryExists)
-            //    {
-            //        return BadRequest(new ApiError("Required CategoryId."));
-            //    }
-            //}
-            
-            var list = await _dishGetAllAsync.SearchAsync(name, category, sortByPrice);
-            if (list == null || !list.Any())
-            {
-                return NotFound(new ApiError("No dishes found matching the criteria."));
-            }
-            if (onlyActive != null)
-            {
-                if (onlyActive == true )
-                {
-                    list = list.Where(d => d.isActive);
-                }
-                if (onlyActive == false)
-                {
-                    list = list.Where(d => d.isActive == false);
-                }
-            }
-            return Ok(list);
 
+            try {
+                var list = await _dishGetAllAsync.SearchAsync(name, category, sortByPrice);
+
+                if (onlyActive != null)
+                {
+                    if (onlyActive == true)
+                    {
+                        list = list.Where(d => d.isActive);
+                    }
+                    if (onlyActive == false)
+                    {
+                        list = list.Where(d => d.isActive == false);
+                    }
+                }
+                return Ok(list);
+
+            }
+
+             catch (NullException ex)
+             {
+                // Capturamos la excepción lanzada en el servicio.
+                // Un 404 es apropiado cuando no se encuentran recursos.
+                return NotFound(new { message = ex.Message });
+             }
         }
        
-        /// <summary>
-        /// Obtiene un plato por su ID.
-        /// </summary>
-        /// <remarks>
-        /// Busca un plato específico en el menú usando su identificador único.
-        /// </remarks>
-
-
 
         // PUT
         /// <summary>
@@ -189,50 +180,53 @@ namespace TP1_Menu_LucasDiaz.Controllers
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> UpdateDish(Guid id, [FromBody] DishUpdateRequest dishRequest)
         {
-            if (dishRequest == null)
-            {
-                return BadRequest(new ApiError("Required dish data."));
+            try { 
+                var result = await _dishUpdate.UpdateDish(id, dishRequest);
+                return Ok(result);
             }
-            if (string.IsNullOrWhiteSpace(dishRequest.Name))
+            catch (NullException ex)
             {
-                return BadRequest(new ApiError("Name is required."));
+              
+                return NotFound(new { message = ex.Message });
             }
-            var existingDish = await _dishExistId.DishExistsID(id);
-            if (!existingDish)
+            catch (RequeridoException ex)
             {
-                return NotFound(new ApiError($"Dish with ID {id} not found."));
+                return BadRequest(new { message = ex.Message });
             }
-            if (await _dishExistName.DishExistsName(dishRequest.Name))
+            catch (ConflictException ex)
             {
-                return Conflict(new ApiError($"Dish {dishRequest.Name} already exists."));
-            }
-
-            if (dishRequest.Category == 0)
-            {
-                return BadRequest(new ApiError("Category is required."));
-            }
-            if (dishRequest.Category != 0)
-            {
-                var categoryExists = await _categoryExist.CategoryExists(dishRequest.Category);
-                if (!categoryExists)
-                {
-                    return BadRequest(new ApiError("Required CategoryId."));
-                }
+                return BadRequest(new { message = ex.Message });
             }
 
-            if (dishRequest.Price <= 0)
-            {
-                return BadRequest(new ApiError("Price must be greater than zero."));
-            }
-
-            var result = await _dishUpdate.UpdateDish(id, dishRequest);
-          
-
-            return Ok(result);
         }
 
         // DELETE
+        /// <summary>
+        /// Eliminar plato
+        /// </summary>
+        /// <remarks>
+        /// Elimina un plato del menú del restaurante.
+        /// </remarks>
+        /// 
+        [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(DishResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiError), StatusCodes.Status409Conflict)]
+        public async Task<IActionResult> DeleteDish(Guid id)
+        {
+            try {
+                var result = await _deleteDish.DeleteDishAsync(id);
+                return Ok(result);
+            }
+            catch (NullException ex) {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (ConflictException ex)
+            {
+                return Conflict(new { message = ex.Message });
+            }
 
+        }
 
 
     }

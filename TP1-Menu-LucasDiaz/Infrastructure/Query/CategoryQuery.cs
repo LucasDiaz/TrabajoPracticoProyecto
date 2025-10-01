@@ -27,5 +27,10 @@ namespace Infrastructure.Query
         {
             return await _context.Categories.FindAsync(id).AsTask();
         }
+
+        public async Task<bool> GetExistCategory(int id)
+        {
+            return await _context.Categories.AnyAsync(d => d.Id == id);
+        }
     }
 }

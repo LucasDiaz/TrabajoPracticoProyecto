@@ -39,7 +39,8 @@ namespace Applications.UseCase.Order
         {
             if (orderRequest.Delivery == null || orderRequest.Delivery.id <= 0)
             {
-                throw new MissingDeliveryTypeException();
+                //400
+                throw new RequeridoException("Debe especificar un tipo de entrega válido");
             }
 
 
@@ -48,7 +49,8 @@ namespace Applications.UseCase.Order
 
             if (deliveryType == null)
             {
-                throw new MissingDeliveryTypeException();
+                //400
+                throw new RequeridoException("Debe especificar un tipo de entrega válido");
             }
 
             var order = new Domain.Entities.Order
@@ -70,11 +72,11 @@ namespace Applications.UseCase.Order
                 var dish = await _dishQuery.GetDishById(item.Id);
                 if (dish == null)
                 {
-                    throw new InvalidDishException(item.Id);
+                    throw new RequeridoException($"El plato con ID {item.Id} no existe o no está disponible.");
                 }
                 if (item.quantity <= 0)
                 {
-                    throw new InvalidQuantityException(item.Id);
+                    throw new RequeridoException("La cantidad debe ser mayor a 0");
                 }
             }
 
@@ -110,11 +112,11 @@ namespace Applications.UseCase.Order
                 var dish = await _dishQuery.GetDishById(item.Id);
                 if (dish == null)
                 {
-                    throw new InvalidDishException(item.Id);
+                    throw new RequeridoException($"El plato con ID {item.Id} no existe o no está disponible.");
                 }
                 if (item.quantity <= 0)
                 {
-                    throw new InvalidQuantityException(item.Id);
+                    throw new RequeridoException("La cantidad debe ser mayor a 0");
                 }
                 total += dish.Price * item.quantity;
             }

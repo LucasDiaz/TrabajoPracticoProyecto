@@ -1,6 +1,8 @@
-﻿using Applications.Interface.Category;
+﻿using Applications.Exceptions;
+using Applications.Interface.Category;
 using Applications.Interface.Dish;
 using Applications.Interface.Dish.IDishService;
+using Applications.Interface.IOrderItem;
 using Applications.Models.Response;
 using Domain.Entities;
 using System;
@@ -15,6 +17,7 @@ namespace Applications.UseCase.DishService
     {
         private readonly IDishCommand _command;
         private readonly IDishQuery _query;
+        private readonly IOrderItemQuery _orderItemquery;
 
         public DishDelete(IDishCommand command, IDishQuery query)
         {
@@ -25,8 +28,19 @@ namespace Applications.UseCase.DishService
         public async Task<DishResponse> DeleteDishAsync(Guid id)
         {
             var dish = await _query.GetDishById(id);
-            
-            dish.Available = false; // Set the dish as inactive before deletion
+            if (dish == null|| !dish.Available)
+            {
+                //400
+                throw new NullException($"El plato con ID {id} no existe o no está disponible.");
+            }
+            bool usedInOrders = await _orderItemquery.ExistsByDishId(id);
+            if (usedInOrders)
+            {
+                //409
+                throw new ConflictException($"Dish with ID {id} cannot be deleted because it is used in existing orders.");
+            }
+
+            dish.Available = false; 
             await _command.UpdateDish(dish);
             return new DishResponse
             {

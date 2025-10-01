@@ -2,6 +2,7 @@
 using Applications.Interface.Order;
 using Applications.Interface.Order.IOrder;
 using Applications.Models.Response;
+using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,12 +20,14 @@ namespace Applications.UseCase.Order
         }
         public async Task<OrderDetailsResponse?> GetOrderById(long id)
         {
+
+
             var order = await _query.GetOrderById(id);
 
             if (order == null)
             {
-                // Si la orden no se encuentra, lanzamos la excepción.
-                throw new OrderNotFoundException(id);
+                // 404
+                throw new NullException($"Orden con ID {id} no encontrada");
             }
 
             if (order != null)

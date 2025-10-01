@@ -1,8 +1,10 @@
 ﻿using Applications.Enum;
+using Applications.Exceptions;
 using Applications.Interface.Category;
 using Applications.Interface.Dish;
 using Applications.Interface.Dish.IDishService;
 using Applications.Models.Response;
+using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +27,13 @@ namespace Applications.UseCase.DishService
         {
 
             var list = await _query.GetAllAsync(name, categoryId, priceOrder);
+            if (list == null || !list.Any())
+            {
+                //404
+                throw new NullException("No se encontraron órdenes con los filtros especificados.");
+            }
+
+
             return list.Select(dishes => new DishResponse
             {
                 Id = dishes.DishId,

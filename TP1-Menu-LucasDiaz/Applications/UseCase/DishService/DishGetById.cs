@@ -1,4 +1,5 @@
-﻿using Applications.Interface.Dish;
+﻿using Applications.Exceptions;
+using Applications.Interface.Dish;
 using Applications.Interface.Dish.IDishService;
 using Applications.Models.Response;
 using System;
@@ -18,7 +19,15 @@ namespace Applications.UseCase.DishService
         }
         public async Task<DishResponse?> GetDishById(Guid id)
         {
+            //if (string.IsNullOrWhiteSpace(id)) { 
+            
+            //}
             var dish = await _dishRepository.GetDishById(id);
+            if (dish == null) 
+            {
+                //404
+                throw new NullException($"El plato con ID {id}  no existe.");
+            }
             
 
             return new DishResponse

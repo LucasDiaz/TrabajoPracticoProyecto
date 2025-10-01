@@ -1,4 +1,5 @@
-﻿using Applications.Interface.DeliveryType;
+﻿using Applications.Exceptions;
+using Applications.Interface.DeliveryType;
 using Applications.Interface.Order;
 using Applications.Interface.Order.IOrder;
 using Applications.Interface.Status;
@@ -37,14 +38,11 @@ namespace Applications.UseCase.Order
 
             if (orders == null || !orders.Any())
             {
-                // Lanzamos la excepción con un mensaje claro.
-                throw new Applications.Exceptions.InvalidOperationException("No se encontraron órdenes con los filtros especificados.");
+           
+                throw new NullException("No se encontraron órdenes con los filtros especificados.");
             }
 
-            //if (orders == null || !orders.Any())
-            //{
-            //    return Enumerable.Empty<OrderDetailsResponse?>();
-            //}
+
 
             var orderResponses = orders.Select(order =>
             new OrderDetailsResponse

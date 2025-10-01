@@ -9,6 +9,7 @@ using Azure.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -35,20 +36,20 @@ namespace Applications.UseCase.Order
             var order = await _orderQuery.GetOrderById(orderId);
             if (order == null) { 
                 //404
-            throw new OrderNotFoundException(orderId);
+            throw new NullException($"Orden con ID {orderId} no encontrada");
             }
         
             // 2. Buscar el item dentro de la orden 
             var item = order.OrderItems.FirstOrDefault(i => i.OrderItemId == itemId);
             if (item == null) {  
                 //404
-                throw new OrderItemNotFoundException(orderId,itemId); 
+                throw new NullException($"Item no encontrado (ID: {itemId}) en la orden {orderId}"); 
             }
 
             if (await _statusQuery.StatusExist(request.status))
             {
                 // Usamos BadRequestException para el 400 - Estado inválido
-                throw new InvalidStatusException(request.status);
+                throw new RequeridoException($"No existe el status '{request.status}'");
             }
             // 3. Actualizar estado del ítem
             item.StatusId = request.status;

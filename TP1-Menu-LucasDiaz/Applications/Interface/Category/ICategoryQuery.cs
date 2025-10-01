@@ -11,5 +11,6 @@ namespace Applications.Interface.Category
     {
         Task<List<Domain.Entities.Category>> GetAllCategories();
         Task<Domain.Entities.Category?> GetCategoryById(int id);
+        Task<bool> GetExistCategory(int id);
     }
 }

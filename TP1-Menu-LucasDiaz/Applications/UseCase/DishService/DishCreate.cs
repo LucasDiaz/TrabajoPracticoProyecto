@@ -1,4 +1,5 @@
-﻿using Applications.Interface.Category;
+﻿using Applications.Exceptions;
+using Applications.Interface.Category;
 using Applications.Interface.Dish;
 using Applications.Interface.Dish.IDishService;
 using Applications.Models.Request;
@@ -30,12 +31,39 @@ namespace Applications.UseCase.DishService
 
         public async Task<DishResponse?> CreateDish(DishRequest dishRequest)
         {
+
+            if (dishRequest == null)
+            {
+                //400
+                throw new RequeridoException("Required dish data.");
+            }
+            if (string.IsNullOrWhiteSpace(dishRequest.Name))
+            {
+                //400
+                throw new RequeridoException("Name is required.");
+            }
+            if (dishRequest.Category != 0)
+            {
+                var categoryExists = await _categoryQuery.GetExistCategory(dishRequest.Category);
+                if (!categoryExists)
+                {
+                    //400
+                    throw new RequeridoException("Required Category data.");
+                }
+            }
+            if (dishRequest.Price <= 0) {
+                //400
+                throw new RequeridoException("Price must be greater than zero.");
+
+            }
+
             //validaciones
             var existingDish = await _query.GetDishByName(dishRequest.Name);
 
             if (existingDish)
             {
-                return null;
+                //409
+                throw new ConflictException("A dish with this name already exists.");
             }
             var category = await _categoryQuery.GetCategoryById(dishRequest.Category);
             var dish = new Dish
@@ -50,7 +78,9 @@ namespace Applications.UseCase.DishService
                 UpdateDate = DateTime.UtcNow,
                 CategoryId = dishRequest.Category
             };
+          
             await _command.CreateDish(dish);
+         
             return new DishResponse
             {
                 Id = dish.DishId,

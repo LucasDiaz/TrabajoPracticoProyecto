@@ -49,9 +49,9 @@ namespace TP1_Menu_LucasDiaz.Controllers
                 var response = await _OrderCreate.CreateOrder(orderRequest);
                 return StatusCode(201, response); // HTTP 201 Created
             }
-            catch (ApplicationValidationException ex)
+            catch (RequeridoException ex)
             {
-                // Captura  (InvalidDishException, InvalidQuantityException, MissingDeliveryTypeException)
+               
                 return BadRequest(new { message = ex.Message }); // HTTP 400 Bad Request
             }
         }
@@ -77,7 +77,7 @@ namespace TP1_Menu_LucasDiaz.Controllers
                 var orders = await _OrderGetAllAsync.GetOrderWithFilter(statusId, from, to);
                 return Ok(orders); // HTTP 200 OK con la lista de órdenes
             }
-            catch (ApplicationValidationException ex)
+            catch (NullException ex)
             {
                 // Capturamos la excepción lanzada en el servicio.
                 // Un 404 es apropiado cuando no se encuentran recursos.
@@ -108,7 +108,7 @@ namespace TP1_Menu_LucasDiaz.Controllers
 
                 return Ok(order); // HTTP 200 OK
             }
-            catch (ApplicationValidationException ex)
+            catch (NullException ex)
             {
                 // Capturamos la InvalidOperationException lanzada por el servicio
                 // y la mapeamos al código HTTP 404 Not Found.
@@ -125,11 +125,11 @@ namespace TP1_Menu_LucasDiaz.Controllers
             try { 
             var response = await _updateItemFromOrder.UpdateItemQuantity(orderId, request);
             return Ok(response); }
-            catch (OrderNotFoundException ex)
+            catch (NullException ex)
             {
                 return NotFound(new { message = ex.Message });
             }
-            catch (ApplicationValidationException ex)
+            catch (RequeridoException ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
@@ -147,15 +147,12 @@ namespace TP1_Menu_LucasDiaz.Controllers
             var response = await _updateOrderItemStatus.UpdateItemStatus(orderId, itemId, request);
             return Ok(response);
             }
-            catch (OrderNotFoundException ex)
+            catch (NullException ex)
             {
                 return NotFound(new { message = ex.Message });
             }
-            catch (OrderItemNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (ApplicationValidationException ex)
+           
+            catch (RequeridoException ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
