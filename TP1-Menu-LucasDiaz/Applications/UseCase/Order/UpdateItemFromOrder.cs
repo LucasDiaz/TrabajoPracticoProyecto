@@ -40,6 +40,25 @@ namespace Applications.UseCase.Order
                 // **Excepción 404: Orden no encontrada**
                 throw new NullException($"Orden con ID {orderId} no encontrada");
             }
+            foreach (var item in listItems.items)
+            {
+                var dish = await _DishQuery.GetDishById(item.Id);
+                if (dish == null|| dish.Available == false)
+                {
+                    // **Excepción 400: Plato no válido**
+                    throw new RequeridoException($"El plato con ID {item.Id} no existe o no está disponible.");
+                }
+               
+                if (item.quantity <= 0)
+                {
+                    // **Excepción 400: Plato no válido**
+                    throw new RequeridoException("La cantidad debe ser mayor a 0");
+                }
+
+
+                
+
+            }
 
             //2. no se puede modificar si no está 'Pending'
             if (order.OverallStatus.Id != 1)
@@ -54,7 +73,7 @@ namespace Applications.UseCase.Order
                 // **Excepción 400: Lista de ítems vacía**
                 throw new RequeridoException("La orden debe contener al menos un plato.");
             }
-            await _OrderItemCommand.RemoveOrderItem(order.OrderItems);
+            //await _OrderItemCommand.RemoveOrderItem(order.OrderItems);
             //4. crear los nuevos items
             var newOrderItems = listItems.items.Select(item => new OrderItem
             {
@@ -70,7 +89,8 @@ namespace Applications.UseCase.Order
             decimal totalPrice = 0;
             foreach (var item in newOrderItems)
             {
-                var dish = await _DishQuery.GetDishById(item.DishId); if (dish == null)
+                var dish = await _DishQuery.GetDishById(item.DishId); 
+                if (dish == null)
                 {
                     // **Excepción 400: Plato no válido**
                     throw new RequeridoException($"El plato con ID {item.DishId} no existe o no está disponible.");

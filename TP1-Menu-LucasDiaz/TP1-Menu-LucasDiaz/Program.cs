@@ -1,23 +1,26 @@
-using Applications.Interface.Category;
-using Applications.Interface.Dish;
-using Applications.UseCase;
 using Applications.Interface;
+using Applications.Interface.Category;
+using Applications.Interface.Category.ICategoryService;
+using Applications.Interface.DeliveryType;
+using Applications.Interface.DeliveryType.IDeliveryTypeService;
+using Applications.Interface.Dish;
+using Applications.Interface.Dish.IDishService;
+using Applications.Interface.IOrderItem;
+using Applications.Interface.Order;
+using Applications.Interface.Order.IOrder;
+using Applications.Interface.Status;
+using Applications.Interface.Status.IStatusService;
+using Applications.UseCase;
+using Applications.UseCase.CategoryService;
+using Applications.UseCase.DeliveryType;
+using Applications.UseCase.DishService;
+using Applications.UseCase.Order;
+using Applications.UseCase.Status;
 using Infrastructure.Command;
 using Infrastructure.Data;
 using Infrastructure.Query;
-
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
-using Applications.Interface.Dish.IDishService;
-using Applications.UseCase.DishService;
-using Applications.Interface.Category.ICategoryService;
-using Applications.UseCase.CategoryService;
-using Applications.Interface.Order;
-using Applications.Interface.Order.IOrder;
-using Applications.UseCase.Order;
-using Applications.Interface.DeliveryType;
-using Applications.Interface.IOrderItem;
-using Applications.Interface.Status;
 
 
 
@@ -64,6 +67,7 @@ builder.Services.AddScoped<IUpdateOrderItemStatus, UpdateOrderItemStatus>();
 
 //builder DeliveryType
 builder.Services.AddScoped<IDeliveryTypeQuery, DeliveryTypeQuery>();
+builder.Services.AddScoped<IDeliveryTypeGetAll, DeliveryTypeGetAll>();
 
 //builder OrderItem
 builder.Services.AddScoped<IOrderItemCommand, OrderItemCommand>();
@@ -71,6 +75,7 @@ builder.Services.AddScoped<IOrderItemQuery, OrderItemQuery>();
 
 //builder status
 builder.Services.AddScoped<IStatusQuery, StatusQuery>();
+builder.Services.AddScoped<IStatusGetAll, StatusGetAll>();
 
 
 //
@@ -104,7 +109,7 @@ if (app.Environment.IsDevelopment())
 //// Middleware custom for exception handling
 //app.UseMiddleware<ErrorHandlingMiddleware>();
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 

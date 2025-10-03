@@ -11,7 +11,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace TP1_Menu_LucasDiaz.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class OrderController : ControllerBase
     {
@@ -116,7 +116,7 @@ namespace TP1_Menu_LucasDiaz.Controllers
             }
         }
         // PUT to update order items
-        [HttpPut("{orderId}")]
+        [HttpPatch("{orderId}")]
         [ProducesResponseType(typeof(OrderUpdateReponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]

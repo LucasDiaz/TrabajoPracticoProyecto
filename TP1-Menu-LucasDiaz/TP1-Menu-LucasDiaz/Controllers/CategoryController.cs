@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace TP1_Menu_LucasDiaz.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class CategoryController : ControllerBase
     {

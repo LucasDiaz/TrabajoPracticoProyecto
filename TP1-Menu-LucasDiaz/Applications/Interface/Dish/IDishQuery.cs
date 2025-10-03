@@ -13,5 +13,8 @@ namespace Applications.Interface.Dish
         Task<bool> GetDishByName(string name);
         Task<Domain.Entities.Dish?> GetDishById(Guid id);
         Task<IEnumerable<Domain.Entities.Dish?>> GetAllAsync(string? name = null, int? categoryId = null, OrderPrice? priceOrder = OrderPrice.ASC);
+
+        Task<bool> DishExistsById(Guid id);
+        Task<bool> DishExists(string name, Guid? id);
     }
 }

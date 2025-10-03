@@ -1,6 +1,8 @@
 ﻿using Applications.Exceptions;
+using Applications.Interface.Category;
 using Applications.Interface.Dish;
 using Applications.Interface.Dish.IDishService;
+using Applications.Models.Request;
 using Applications.Models.Response;
 using System;
 using System.Collections.Generic;
@@ -13,10 +15,14 @@ namespace Applications.UseCase.DishService
     public class DishGetById : IDishGetById
     {
         private readonly IDishQuery _dishRepository;
-        public DishGetById(IDishQuery dishRepository)
+        private readonly ICategoryQuery _categoryQuery;
+
+        public DishGetById(IDishQuery dishRepository, ICategoryQuery categoryQuery)
         {
             _dishRepository = dishRepository;
+            _categoryQuery = categoryQuery;
         }
+
         public async Task<DishResponse?> GetDishById(Guid id)
         {
             //if (string.IsNullOrWhiteSpace(id)) { 
@@ -26,9 +32,18 @@ namespace Applications.UseCase.DishService
             if (dish == null) 
             {
                 //404
-                throw new NullException($"El plato con ID {id}  no existe.");
+                throw new RequeridoException($"El plato con ID {id}  no existe.");
             }
-            
+            if (dish.Category.Id != 0)
+            {
+                var categoryExists = await _categoryQuery.GetExistCategory(dish.Category.Id);
+                if (!categoryExists)
+                {
+                    //400
+                    throw new RequeridoException("Required Category data.");
+                }
+            }
+
 
             return new DishResponse
             {

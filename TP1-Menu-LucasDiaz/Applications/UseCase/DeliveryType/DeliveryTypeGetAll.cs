@@ -20,11 +20,12 @@ namespace Applications.UseCase.DeliveryType
         public async Task<List<DeliveryTypeResponse>> GetAllDeliveryType()
         {
             var deliveryTypes = await _query.GetAllDeliveryTypes();
-            return deliveryTypes.Select(dt => new DeliveryTypeResponse
+           return deliveryTypes.Select(dt => new DeliveryTypeResponse
             {
                 Id = dt.Id,
                 Name = dt.Name
             }).ToList();
+           
         }
     }
 }

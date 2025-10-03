@@ -33,7 +33,7 @@ namespace Applications.UseCase.DishService
                 throw new NullException("No se encontraron órdenes con los filtros especificados.");
             }
 
-
+            
             return list.Select(dishes => new DishResponse
             {
                 Id = dishes.DishId,

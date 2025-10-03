@@ -55,13 +55,15 @@ namespace Applications.UseCase.DishService
                 throw new RequeridoException("Price must be greater than zero.");
 
             }
-            var existingDish = await _query.GetDishByName(DishUpdateRequest.Name);
+           
+            var existingDish = await _query.DishExists(DishUpdateRequest.Name,id);
 
             if (existingDish)
             {
                 //409
                 throw new ConflictException("A dish with this name already exists.");
             }
+           
 
 
             Dish.Name = DishUpdateRequest.Name;

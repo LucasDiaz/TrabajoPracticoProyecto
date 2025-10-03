@@ -73,12 +73,12 @@ namespace TP1_Menu_LucasDiaz.Controllers
             }
             catch (ConflictException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return Conflict(new { message = ex.Message });
             }
-          
 
 
-          
+
+
         }
 
         //GET by ID
@@ -101,7 +101,7 @@ namespace TP1_Menu_LucasDiaz.Controllers
                 var dish = await _dishGetById.GetDishById(id);
                 return Ok(dish);
             }
-            catch (NullException ex)
+            catch (RequeridoException ex)
             {
                 return NotFound(new ApiError(ex.Message));
             }
@@ -123,7 +123,7 @@ namespace TP1_Menu_LucasDiaz.Controllers
         Description = "Obtiene una lista de platos del menú con opciones de filtrado y ordenamiento."
         )]
         [ProducesResponseType(typeof(IEnumerable<DishResponse>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
+        //[ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Search(
             [FromQuery] string? name,
@@ -134,7 +134,8 @@ namespace TP1_Menu_LucasDiaz.Controllers
 
 
 
-            try {
+            try
+            {
                 var list = await _dishGetAllAsync.SearchAsync(name, category, sortByPrice);
 
                 if (onlyActive != null)
@@ -143,23 +144,20 @@ namespace TP1_Menu_LucasDiaz.Controllers
                     {
                         list = list.Where(d => d.isActive);
                     }
-                    if (onlyActive == false)
-                    {
-                        list = list.Where(d => d.isActive == false);
-                    }
+
                 }
                 return Ok(list);
 
             }
 
-             catch (NullException ex)
-             {
+            catch (NullException ex)
+            {
                 // Capturamos la excepción lanzada en el servicio.
                 // Un 404 es apropiado cuando no se encuentran recursos.
                 return NotFound(new { message = ex.Message });
-             }
+            }
         }
-       
+
 
         // PUT
         /// <summary>
@@ -195,7 +193,7 @@ namespace TP1_Menu_LucasDiaz.Controllers
             }
             catch (ConflictException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return Conflict(new { message = ex.Message });
             }
 
         }
@@ -210,6 +208,7 @@ namespace TP1_Menu_LucasDiaz.Controllers
         /// 
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(DishResponse), StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> DeleteDish(Guid id)
@@ -219,7 +218,7 @@ namespace TP1_Menu_LucasDiaz.Controllers
                 return Ok(result);
             }
             catch (NullException ex) {
-                return BadRequest(new { message = ex.Message });
+                return NotFound(new { message = ex.Message });
             }
             catch (ConflictException ex)
             {

@@ -19,10 +19,11 @@ namespace Applications.UseCase.DishService
         private readonly IDishQuery _query;
         private readonly IOrderItemQuery _orderItemquery;
 
-        public DishDelete(IDishCommand command, IDishQuery query)
+        public DishDelete(IDishCommand command, IDishQuery query, IOrderItemQuery orderItemquery)
         {
             _command = command;
             _query = query;
+            _orderItemquery = orderItemquery;
         }
 
         public async Task<DishResponse> DeleteDishAsync(Guid id)

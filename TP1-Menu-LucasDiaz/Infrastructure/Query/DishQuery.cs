@@ -58,14 +58,35 @@ namespace Infrastructure.Query
 
         public async Task<Dish?> GetDishById(Guid id)
         {
-            return await _context.Dishes.FindAsync(id).AsTask();
+            return await _context.Dishes
+                                .Include(d => d.Category) // <--- ¡Esto es lo que faltaba!
+                                .FirstOrDefaultAsync(d => d.DishId == id);
+            //return await _context.Dishes.FindAsync(id).AsTask();
         }
         public async Task<bool> GetDishByName(string name)
         {
             return await _context.Dishes.AnyAsync(d => d.Name == name);
         }
 
+        public async Task<bool> DishExistsById(Guid id)
+        {
+            return await _context.Dishes.AnyAsync(d => d.DishId == id);
+        }
 
+        public async Task<bool> DishExists(string name, Guid? id)
+        {
+            var query = _context.Dishes.AsQueryable();
+
+            if (id.HasValue)
+            {
+                // Si estamos actualizando, excluimos el ID actual de la búsqueda
+                query = query.Where(d => d.DishId != id.Value);
+            }
+
+            // Ahora la búsqueda de conflicto solo se hará en los OTROS platos
+            return await query.AnyAsync(d => d.Name == name);
+
+        }
 
     }
 }
