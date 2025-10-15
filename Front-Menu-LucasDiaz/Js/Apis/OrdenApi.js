@@ -35,32 +35,20 @@ export async function CreateOrder(orderRequest) {
 }
 
 
-/**
- * Obtiene una lista de órdenes con filtros opcionales. Corresponde al [HttpGet] del backend.
- * @param {number | null} statusId Filtro opcional por ID de estado.
- * @param {string | null} from Fecha de inicio opcional (formato YYYY-MM-DD o similar).
- * @param {string | null} to Fecha de fin opcional (formato YYYY-MM-DD o similar).
- * @returns {Promise<Array<Object>>} Promesa que resuelve con IEnumerable<OrderDetailsResponse> (HTTP 200).
- */
-export async function GetOrders(statusId = null, from = null, to = null) {
-    
-    // Construir los Query Parameters
-    const params = new URLSearchParams();
-    if (statusId !== null) params.append('statusId', statusId);
-    if (from !== null) params.append('from', from);
-    if (to !== null) params.append('to', to);
-
-    const url = `${API_BASE_URL}?${params.toString()}`;
-
+export async function GetOrders(filters = {}) {
     try {
-        const response = await fetch(url, { method: 'GET' });
+        // Construimos los parámetros de la URL dinámicamente
+        const params = new URLSearchParams();
+        if (filters.statusId) params.append('statusId', filters.statusId);
+        if (filters.from) params.append('from', filters.from);
+        if (filters.to) params.append('to', filters.to);
+
+        const response = await axios.get(API_BASE, { params });
         
-        // Maneja HTTP 200 OK y posibles errores (400, 404)
-        return await handleResponse(response);
-        
+        return response.data || []; // Devuelve los datos o un array vacío si no hay nada.
     } catch (error) {
-        console.error("Error al obtener las órdenes filtradas:", error.message);
-        throw error;
+        console.error("Error al obtener las órdenes:", error.response?.data || error.message);
+        return [];
     }
 }
 

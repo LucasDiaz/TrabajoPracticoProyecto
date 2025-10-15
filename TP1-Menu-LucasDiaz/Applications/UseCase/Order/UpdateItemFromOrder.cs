@@ -40,25 +40,6 @@ namespace Applications.UseCase.Order
                 // **Excepción 404: Orden no encontrada**
                 throw new NullException($"Orden con ID {orderId} no encontrada");
             }
-            foreach (var item in listItems.items)
-            {
-                var dish = await _DishQuery.GetDishById(item.Id);
-                if (dish == null|| dish.Available == false)
-                {
-                    // **Excepción 400: Plato no válido**
-                    throw new RequeridoException($"El plato con ID {item.Id} no existe o no está disponible.");
-                }
-               
-                if (item.quantity <= 0)
-                {
-                    // **Excepción 400: Plato no válido**
-                    throw new RequeridoException("La cantidad debe ser mayor a 0");
-                }
-
-
-                
-
-            }
 
             //2. no se puede modificar si no está 'Pending'
             if (order.OverallStatus.Id != 1)
@@ -67,6 +48,24 @@ namespace Applications.UseCase.Order
                 string currentStatusName = order.OverallStatus?.Name ?? "Desconocido";
                 throw new RequeridoException($"La orden está en estado '{currentStatusName}' y no se puede modificar.");
             }
+
+
+            listItems.items.ForEach(async item =>
+            {
+                var dish = await _DishQuery.GetDishById(item.Id);
+                if (dish == null || dish.Available == false)
+                {
+                    // **Excepción 400: Plato no válido**
+                    throw new RequeridoException($"El plato con ID {item.Id} no existe o no está disponible.");
+                }
+                if (item.quantity <= 0)
+                {
+                    // **Excepción 400: Plato no válido**
+                    throw new RequeridoException("La cantidad debe ser mayor a 0");
+                }
+            });
+           
+
             //3. borrar todos los items de la orden
             if (listItems.items == null || !listItems.items.Any())
             {
@@ -89,21 +88,12 @@ namespace Applications.UseCase.Order
             decimal totalPrice = 0;
             foreach (var item in newOrderItems)
             {
-                var dish = await _DishQuery.GetDishById(item.DishId); 
-                if (dish == null)
+                var dish = await _DishQuery.GetDishById(item.DishId);
+                if (dish != null)
                 {
-                    // **Excepción 400: Plato no válido**
-                    throw new RequeridoException($"El plato con ID {item.DishId} no existe o no está disponible.");
-                }
-                if (item.Quantity <= 0)
-                {
-                    // **Excepción 400: Plato no válido**
-                    throw new RequeridoException("La cantidad debe ser mayor a 0");
-                }
-                
- 
                     totalPrice += dish.Price * item.Quantity;
-               
+                }
+
             }
             //7. actualizar la orden
             order.Price = totalPrice;

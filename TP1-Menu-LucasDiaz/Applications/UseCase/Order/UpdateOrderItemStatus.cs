@@ -5,6 +5,8 @@ using Applications.Interface.Order.IOrder;
 using Applications.Interface.Status;
 using Applications.Models.Request;
 using Applications.Models.Response;
+using Domain.Entities;
+using Applications.Enum;
 using Azure.Core;
 using System;
 using System.Collections.Generic;
@@ -51,8 +53,10 @@ namespace Applications.UseCase.Order
                 // Usamos BadRequestException para el 400 - Estado inválido
                 throw new RequeridoException($"No existe el status '{request.status}'");
             }
-            // 3. Actualizar estado del ítem
-            item.StatusId = request.status;
+
+            if (!IsValidTransition(item.StatusId, request.status))
+                // 3. Actualizar estado del ítem
+                item.StatusId = request.status;
 
             // 4. Actualizar estado general de la orden
             UpdateOrderStatus(order);
@@ -71,31 +75,27 @@ namespace Applications.UseCase.Order
 
         private void UpdateOrderStatus(Domain.Entities.Order order)
         {
-            // Si todos los ítems están Ready -> orden Ready
-            if (order.OrderItems.All(i => i.StatusId == 3))
-            {
-                order.StatusId = 3;
-            }
-            // Si al menos uno está In Progress -> orden In Progress
-            else if (order.OrderItems.Any(i => i.StatusId == 2))
-            {
-                order.StatusId = 2;
-            }
-            // Si al menos uno está Delivery -> orden Delivery
-            else if (order.OrderItems.Any(i => i.StatusId == 4))
-            {
-                order.StatusId = 4;
-            }
-            // Si todos los ítems están Closed -> orden Closed
-            else if (order.OrderItems.All(i => i.StatusId == 5))
-            {
-                order.StatusId = 5;
-            }
-            // Caso inicial -> Pending
+            if (order.OrderItems.All(i => i.StatusId == (int)OrderStatus.Closed))
+                order.StatusId = (int)OrderStatus.Closed;
+            else if (order.OrderItems.All(i => i.StatusId == (int)OrderStatus.Ready))
+                order.StatusId = (int)OrderStatus.Ready;
+            else if (order.OrderItems.Any(i => i.StatusId == (int)OrderStatus.InProgress))
+                order.StatusId = (int)OrderStatus.InProgress;
+            else if (order.OrderItems.Any(i => i.StatusId == (int)OrderStatus.Delivery))
+                order.StatusId = (int)OrderStatus.Delivery;
             else
-            {
-                order.StatusId = 1;
-            }
+                order.StatusId = (int)OrderStatus.Pending;
+        }
+
+        private bool IsValidTransition(int current, int next)
+        {
+            // Ejemplo de reglas básicas: Pendiente -> En preparación -> Listo -> Entregado
+            if (current == (int)OrderStatus.Closed && next != (int)OrderStatus.Closed)
+                return false; // no se puede reabrir
+            if (current == (int)OrderStatus.Delivery && next == (int)OrderStatus.InProgress)
+                return false; // no volver atrás
+            return true;
         }
     }
+    
 }

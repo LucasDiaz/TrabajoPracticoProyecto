@@ -207,15 +207,14 @@ namespace TP1_Menu_LucasDiaz.Controllers
         /// </remarks>
         /// 
         [HttpDelete("{id}")]
-        [ProducesResponseType(typeof(DishResponse), StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ApiError), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(DishResponse), StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiError), StatusCodes.Status409Conflict)]
         public async Task<IActionResult> DeleteDish(Guid id)
         {
             try {
                 var result = await _deleteDish.DeleteDishAsync(id);
-                return Ok(result);
+                return NoContent();
             }
             catch (NullException ex) {
                 return NotFound(new { message = ex.Message });

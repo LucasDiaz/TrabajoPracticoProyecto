@@ -1,3 +1,18 @@
+html, body {
+    /* Aseguramos que body y html ocupen toda la altura de la ventana visible */
+    height: 100%; 
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    /* Convierte el body en un contenedor flex */
+    display: flex;
+    /* Organiza los hijos (header, main, footer) verticalmente */
+    flex-direction: column;
+    /* El fondo del body puede ser útil si los otros elementos no cubren todo */
+    background-color: #343a40; 
+}
 
 
 .header-principal {
@@ -82,7 +97,7 @@
     background-color: #343a40; 
     width: 100%; 
     flex-grow: 1; 
-
+    flex-grow: 1; 
     /* CLAVE: Eliminar el padding lateral de Bootstrap */
     padding-left: 0 !important;
     padding-right: 0 !important;
