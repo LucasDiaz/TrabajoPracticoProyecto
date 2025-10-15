@@ -80,6 +80,18 @@ builder.Services.AddScoped<IStatusGetAll, StatusGetAll>();
 
 //
 builder.Services.AddControllers();
+
+var MyAllowSpecificOrigins = "AllowFrontend";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy => policy
+            .AllowAnyOrigin() // dirección del frontend
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+    );
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -97,6 +109,8 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+app.UseCors(MyAllowSpecificOrigins);
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
