@@ -35,26 +35,28 @@ namespace Applications.UseCase.Order
         public async Task<OrderUpdateReponse> UpdateItemStatus(long orderId, int itemId, OrderItemUpdateRequest request)
         {
             // 1. Buscar la orden
-            var order = await _orderQuery.GetOrderById(orderId);
+            var order = await _orderQuery.GetOrderItemsById(orderId);
             if (order == null) { 
                 //404
             throw new NullException($"Orden con ID {orderId} no encontrada");
             }
-        
-            // 2. Buscar el item dentro de la orden 
+
+
             var item = order.OrderItems.FirstOrDefault(i => i.OrderItemId == itemId);
             if (item == null) {  
                 //404
                 throw new NullException($"Item no encontrado (ID: {itemId}) en la orden {orderId}"); 
             }
 
-            if (await _statusQuery.StatusExist(request.status))
+            if (!await _statusQuery.StatusExist(request.status))
             {
                 // Usamos BadRequestException para el 400 - Estado inválido
                 throw new RequeridoException($"No existe el status '{request.status}'");
             }
 
-            if (!IsValidTransition(item.StatusId, request.status))
+            if (!IsValidTransition(item.StatusId, request.status)) {
+                throw new RequeridoException($"Transición de estado inválida para el ítem {itemId}. No se puede pasar de {item.StatusId} a {request.status}.");
+            }
                 // 3. Actualizar estado del ítem
                 item.StatusId = request.status;
 

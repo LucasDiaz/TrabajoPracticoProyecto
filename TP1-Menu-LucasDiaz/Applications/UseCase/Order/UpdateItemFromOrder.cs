@@ -72,7 +72,17 @@ namespace Applications.UseCase.Order
                 // **Excepción 400: Lista de ítems vacía**
                 throw new RequeridoException("La orden debe contener al menos un plato.");
             }
-            //await _OrderItemCommand.RemoveOrderItem(order.OrderItems);
+
+            var dishIds = listItems.items.Select(i => i.Id).ToList();
+            var dishesFromDb = await _DishQuery.GetDishesByIds(dishIds);
+
+            if (dishesFromDb.Count != dishIds.Count)
+                throw new RequeridoException("Uno o más platos especificados no existen.");
+            if (dishesFromDb.Any(d => !d.Available))
+                throw new RequeridoException("Uno o más platos especificados no están disponibles.");
+
+
+            await _OrderItemCommand.RemoveOrderItem(order.OrderItems);
             //4. crear los nuevos items
             var newOrderItems = listItems.items.Select(item => new OrderItem
             {
@@ -96,7 +106,7 @@ namespace Applications.UseCase.Order
 
             }
             //7. actualizar la orden
-            order.Price = totalPrice;
+            order.Price = await Calculate(newOrderItems, dishesFromDb);
             order.UpdateDate = DateTime.Now;
             await _command.UpdateOrder(order);
             //8. retornar la respuesta
@@ -107,5 +117,24 @@ namespace Applications.UseCase.Order
                 UpdateAt = order.UpdateDate
             };
         }
+
+
+        private async Task<decimal> Calculate(List<OrderItem> newOrderItems, List<Dish> dishes)
+        {
+            decimal total = 0;
+            var dishObt = dishes.ToDictionary(d => d.DishId);
+
+            foreach (var item in newOrderItems)
+            {
+                if (dishObt.TryGetValue(item.DishId, out var dish))
+                {
+                    total += dish.Price * item.Quantity;
+                }
+            }
+            return total;
+        }
+
+
+
     }
 }

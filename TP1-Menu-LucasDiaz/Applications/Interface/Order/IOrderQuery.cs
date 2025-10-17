@@ -11,5 +11,7 @@ namespace Applications.Interface.Order
         Task<Domain.Entities.Order?> GetOrderById(long id);
         Task<IEnumerable<Domain.Entities.Order?>> GetOrderWithFilter(int? statusId, DateTime? from, DateTime? to);
         Task<List<Domain.Entities.Order>> GetAllOrders();
+
+        Task<Domain.Entities.Order?> GetOrderItemsById(long id);
     }
 }

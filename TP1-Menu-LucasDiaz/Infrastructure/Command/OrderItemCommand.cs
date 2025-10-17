@@ -35,10 +35,10 @@ namespace Infrastructure.Command
 
         }
 
-        public Task UpdateOrderItem(OrderItem orderItem)
+        public async Task UpdateOrderItem(OrderItem orderItem)
         {
             _context.OrderItems.Update(orderItem);
-            return Task.CompletedTask;
+            await _context.SaveChangesAsync();
         }
     }
 }

@@ -88,6 +88,10 @@ namespace Infrastructure.Query
 
         }
 
+        public async Task<List<Dish>> GetDishesByIds(List<Guid> ids)
+        {
+            return await _context.Dishes.Where(d => ids.Contains(d.DishId)).ToListAsync();
+        }
     }
 }
 

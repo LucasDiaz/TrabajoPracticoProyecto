@@ -42,7 +42,7 @@ namespace Applications.UseCase.Order
                     deliveryType = new GenericResponse { Id = order.DeliveryTypeId, Name = order.DeliveryType?.Name ?? "Desconocido" },
                     items = order.OrderItems.Select(item => new OrderItemResponse
                     {
-                        Id = 2,
+                        Id = item.OrderItemId,
                         Quantity = item.Quantity,
                         notes = item.Dish?.Name,
                         dish = new DishShortResponse { Id = item.DishId, Name = item.Dish?.Name ?? "Desconocido", Image = item.Dish?.ImageUrl ?? "No encontrada" },

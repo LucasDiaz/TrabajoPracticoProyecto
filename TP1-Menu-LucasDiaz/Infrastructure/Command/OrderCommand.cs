@@ -22,15 +22,15 @@ namespace Infrastructure.Command
             await _context.SaveChangesAsync();
 
         }
-        public Task RemoveOrder(Domain.Entities.Order order)
+        public async Task RemoveOrder(Domain.Entities.Order order)
         {
             _context.Orders.Remove(order);
-            return Task.CompletedTask;
+             await _context.SaveChangesAsync();
         }
-        public Task UpdateOrder(Domain.Entities.Order order)
+        public async Task UpdateOrder(Domain.Entities.Order order)
         {
             _context.Orders.Update(order);
-            return Task.CompletedTask;
+            await _context.SaveChangesAsync();
         }
     }
 }

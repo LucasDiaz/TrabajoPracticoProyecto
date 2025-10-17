@@ -17,6 +17,15 @@ namespace Infrastructure.Query
         {
             _context = context;
         }
+        public async Task<Order?> GetOrderItemsById(long id)
+        {
+            return await _context.Orders
+                         .Include(order => order.OrderItems)
+                         .FirstOrDefaultAsync(order => order.OrderId == id);
+        }
+        
+
+
         public async Task<Order?> GetOrderById(long id)
         {
             return await _context.Orders

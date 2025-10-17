@@ -14,6 +14,7 @@ namespace Applications.Interface.Dish
         Task<Domain.Entities.Dish?> GetDishById(Guid id);
         Task<IEnumerable<Domain.Entities.Dish?>> GetAllAsync(string? name = null, int? categoryId = null, OrderPrice? priceOrder = OrderPrice.ASC);
 
+        Task<List<Domain.Entities.Dish>> GetDishesByIds(List<Guid> ids);
         Task<bool> DishExistsById(Guid id);
         Task<bool> DishExists(string name, Guid? id);
     }
