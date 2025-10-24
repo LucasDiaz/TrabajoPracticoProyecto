@@ -27,7 +27,13 @@ namespace Infrastructure.Query
         }
         public async Task<bool> ExistsByDishId(Guid dishId)
         {
-            return await _context.OrderItems.AnyAsync(oi => oi.DishId == dishId);
+            var inactiveStatuses = new[] { 4, 5 };
+
+            return await _context.OrderItems
+                .AnyAsync(item =>
+                    item.DishId == dishId &&
+                    !inactiveStatuses.Contains(item.Order.StatusId)
+                );
         }
 
         public Task<OrderItem?> GetOrderItemById(long id)

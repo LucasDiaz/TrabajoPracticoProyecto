@@ -1,4 +1,5 @@
-﻿using Applications.Exceptions;
+﻿using Applications.Enum;
+using Applications.Exceptions;
 using Applications.Interface.Dish;
 using Applications.Interface.IOrderItem;
 using Applications.Interface.Order;
@@ -12,16 +13,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace Applications.UseCase.Order
 {
-    public class UpdateItemFromOrder: IUpdateItemFromOrder
+    public class UpdateItemFromOrder : IUpdateItemFromOrder
     {
         private readonly IOrderCommand _command;
         private readonly IOrderQuery _query;
         private readonly IOrderItemQuery _OrderItemQuery;
         private readonly IOrderItemCommand _OrderItemCommand;
         private readonly IDishQuery _DishQuery;
-
         public UpdateItemFromOrder(IOrderCommand command, IOrderQuery query, IOrderItemQuery orderItemQuery, IOrderItemCommand OrderItemCommand, IDishQuery dishQuery)
         {
             _command = command;
@@ -30,60 +31,123 @@ namespace Applications.UseCase.Order
             _OrderItemCommand = OrderItemCommand;
             _DishQuery = dishQuery;
         }
-
         public async Task<OrderUpdateReponse> UpdateItemQuantity(long orderId, OrderUpdateRequest listItems)
         {
-            //1. buscar la orden por id
             var order = await _query.GetOrderById(orderId);
+
             if (order == null)
             {
-                // **Excepción 404: Orden no encontrada**
                 throw new NullException($"Orden con ID {orderId} no encontrada");
             }
 
-            //2. no se puede modificar si no está 'Pending'
             if (order.OverallStatus.Id != 1)
             {
-                // **Excepción 400: Estado no modificable**
                 string currentStatusName = order.OverallStatus?.Name ?? "Desconocido";
                 throw new RequeridoException($"La orden está en estado '{currentStatusName}' y no se puede modificar.");
             }
 
-
-            listItems.items.ForEach(async item =>
-            {
-                var dish = await _DishQuery.GetDishById(item.Id);
-                if (dish == null || dish.Available == false)
-                {
-                    // **Excepción 400: Plato no válido**
-                    throw new RequeridoException($"El plato con ID {item.Id} no existe o no está disponible.");
-                }
-                if (item.quantity <= 0)
-                {
-                    // **Excepción 400: Plato no válido**
-                    throw new RequeridoException("La cantidad debe ser mayor a 0");
-                }
-            });
-           
-
-            //3. borrar todos los items de la orden
+            // 3. Validar la lista de ítems de la solicitud
             if (listItems.items == null || !listItems.items.Any())
             {
-                // **Excepción 400: Lista de ítems vacía**
                 throw new RequeridoException("La orden debe contener al menos un plato.");
             }
 
             var dishIds = listItems.items.Select(i => i.Id).ToList();
             var dishesFromDb = await _DishQuery.GetDishesByIds(dishIds);
+            var dishesDictionary = dishesFromDb.ToDictionary(d => d.DishId);
 
+            // VALIDACIÓN INTEGRAL DE LOS RESULTADOS OBTENIDOS
             if (dishesFromDb.Count != dishIds.Count)
+            {
                 throw new RequeridoException("Uno o más platos especificados no existen.");
+            }
             if (dishesFromDb.Any(d => !d.Available))
+            {
                 throw new RequeridoException("Uno o más platos especificados no están disponibles.");
+            }
+
+                // Iteramos sobre los ítems solicitados para validar disponibilidad y cantidad
+            foreach (var item in listItems.items)
+            {
+                // Validar Disponibilidad y Cantidad usando el diccionario cargado
+                if (!dishesDictionary.TryGetValue(item.Id, out var dish) || !dish.Available)
+                {
+                    throw new RequeridoException($"El plato con ID {item.Id} no existe o no está disponible.");
+                }
+
+                if (item.quantity <= 0)
+                {
+                    throw new RequeridoException("La cantidad debe ser mayor a 0");
+                }
+            }
+            var itemsToRemove = new List<OrderItem>();
+
+            foreach (var itemRequest in listItems.items)
+            {
+                var existingItem = order.OrderItems.FirstOrDefault(oi => oi.DishId == itemRequest.Id);
+
+                if (itemRequest.quantity > 0)
+                {
+                    // --- LÓGICA DE AÑADIR O ACTUALIZAR ---
+                    var dish = dishesDictionary[itemRequest.Id]; // Plato ya validado
+
+                    if (existingItem != null)
+                    {
+                        // Actualizar ítem existente
+                        existingItem.Quantity = itemRequest.quantity;
+                        existingItem.Notes = itemRequest.notes;
+                        // EF Core rastrea esto como 'Modified'
+                    }
+                    else
+                    {
+                        // Añadir ítem nuevo
+                        var newItem = new OrderItem
+                        {
+                            // OrderId se setea por EF por navegación
+                            DishId = itemRequest.Id,
+                            Quantity = itemRequest.quantity,
+                            Notes = itemRequest.notes,
+                            StatusId = 1, // Pendiente
+                        };
+                        order.OrderItems.Add(newItem); // EF rastrea esto como 'Added'
+                    }
+                }
+                else // itemRequest.quantity == 0
+                {
+                    // --- LÓGICA DE BORRADO ---
+                    if (existingItem != null)
+                    {
+                        // 1. Añadimos a la lista de ítems a borrar
+                        itemsToRemove.Add(existingItem);
+                    }
+                    // Si no existía y la cantidad es 0, no hacemos nada.
+                }
+            }
+
+            // --- 4. EJECUTAR BORRADOS ---
+            if (itemsToRemove.Any())
+            {
+                // 1. Borrar de la Base de Datos (marca como 'Deleted' en el contexto)
+                await _OrderItemCommand.RemoveOrderItem(itemsToRemove);
+
+                // 2. (¡EL PASO CLAVE!) Borrar de la lista en memoria
+                // Esto asegura que Calculate() sea correcto y que
+                // _context.Update(order) no intente re-agregar los ítems.
+                foreach (var item in itemsToRemove)
+                {
+                    order.OrderItems.Remove(item);
+                }
+            }
+            if (!order.OrderItems.Any())
+            {
+                // ¡Si la orden quedó vacía (todos los ítems en 0),
+                // la marcamos como Cancelada!
+                // (Asumo que 5 es 'Canceled' según tu OpenApi)
+                order.StatusId = (int)OrderStatus.Closed;
+            }
 
 
-            await _OrderItemCommand.RemoveOrderItem(order.OrderItems);
-            //4. crear los nuevos items
+            // 5. Crear e Insertar los nuevos ítems
             var newOrderItems = listItems.items.Select(item => new OrderItem
             {
                 OrderId = orderId,
@@ -92,35 +156,27 @@ namespace Applications.UseCase.Order
                 Notes = item.notes,
                 StatusId = 1
             }).ToList();
-            //5. Insertar los nuevos items
-            await _OrderItemCommand.InsertOrderItemRange(newOrderItems);
-            //6. recalcular el precio total
-            decimal totalPrice = 0;
-            foreach (var item in newOrderItems)
-            {
-                var dish = await _DishQuery.GetDishById(item.DishId);
-                if (dish != null)
-                {
-                    totalPrice += dish.Price * item.Quantity;
-                }
 
-            }
-            //7. actualizar la orden
-            order.Price = await Calculate(newOrderItems, dishesFromDb);
+            await _OrderItemCommand.InsertOrderItemRange(newOrderItems);
+
+            // 6. Recalcular y Actualizar la orden
+            // Corregido: Llamamos al método Calculate (ahora síncrono en la práctica si quitamos el await)
+            order.Price = Calculate(newOrderItems, dishesFromDb); // Ya no necesita 'await'
             order.UpdateDate = DateTime.Now;
-            await _command.UpdateOrder(order);
-            //8. retornar la respuesta
+            await _command.UpdateOrder(order); // Requiere SaveChangesAsync en el Command
+
+            // 7. Retornar la respuesta (Se mantiene igual)
             return new OrderUpdateReponse
             {
                 orderNumber = (int)order.OrderId,
                 totalAmount = (double)order.Price,
                 UpdateAt = order.UpdateDate
             };
+
         }
-
-
-        private async Task<decimal> Calculate(List<OrderItem> newOrderItems, List<Dish> dishes)
+        private decimal Calculate(List<OrderItem> newOrderItems, List<Dish> dishes)
         {
+            // ... La lógica de cálculo se mantiene igual y es ahora síncrona ...
             decimal total = 0;
             var dishObt = dishes.ToDictionary(d => d.DishId);
 
@@ -133,8 +189,7 @@ namespace Applications.UseCase.Order
             }
             return total;
         }
-
-
-
+        
     }
+
 }

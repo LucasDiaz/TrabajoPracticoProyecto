@@ -37,10 +37,34 @@ namespace Applications.UseCase.Order
 
         public async Task<OrderCreateResponse?> CreateOrder(OrderRequest orderRequest)
         {
-            if (orderRequest.Delivery == null || orderRequest.Delivery.id <= 0)
+            if (orderRequest.Delivery == null || orderRequest.Delivery.id <= 0 )
             {
                 //400
                 throw new RequeridoException("Debe especificar un tipo de entrega válido");
+            }
+            string deliveryTo = orderRequest.Delivery.to;
+            int deliveryTypeId = orderRequest.Delivery.id;
+            if (string.IsNullOrEmpty(deliveryTo))
+            {
+                // Aplicar la lógica de negocio para cada ID
+                switch (deliveryTypeId)
+                {
+                    case 1: // Delivery (A Domicilio)
+                            // Caso: ({"id": 1, "to": None}, 400) -> Requiere dirección
+                        throw new RequeridoException("Para el servicio a domicilio, debe especificar una dirección de entrega válida.");
+
+                    case 2: // Take Away (Para Llevar/Retiro)
+                            // Caso: ({"id": 2, "to": ""}, 400) -> Requiere nombre/identificador de cliente
+                        throw new RequeridoException("Para retirar, debe especificar un nombre o identificador de cliente.");
+
+                    case 3: // Dine In (Consumo en Sitio/Mesa)
+                            // Caso: ({"id": 3, "to": ""}, 400) -> Requiere número de mesa
+                        throw new RequeridoException("Para consumo en el sitio, debe especificar un número de mesa.");
+
+                    default:
+                        // Fallback para cualquier otro ID de delivery que requiera un destino
+                        throw new RequeridoException("El destino de entrega (DeliveryTo) no puede ser vacío para el tipo de entrega seleccionado.");
+                }
             }
 
 
