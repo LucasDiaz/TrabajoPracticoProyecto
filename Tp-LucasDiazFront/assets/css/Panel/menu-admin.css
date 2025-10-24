@@ -1,127 +1,201 @@
- 
-    .menu-admin-container {
-    background-color: #ffffff;
-    border-radius: 14px;
-    padding: 2rem;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07);
-    animation: fadeIn 0.4s ease-in-out;
-    }
+/* --- CONTENEDOR PRINCIPAL --- */
+.menu-admin-container {
+  background-color: var(--color-card);
+  border-radius: 16px;
+  padding: 2.2rem;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.05);
+  animation: fadeIn 0.4s ease-in-out;
+}
 
-   
-    @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-    }
+/* --- ANIMACIÓN SUAVE --- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-    .page-header {
-    border-bottom: 2px solid var(--color-fondo-secundario);
-    padding-bottom: 1rem;
-    margin-bottom: 2rem;
-    }
-    .page-header h1 {
-    font-weight: 500;
-    font-size: 1.6rem;
-    color: var(--color-principal-oscuro);
-    }
+/* --- ENCABEZADO --- */
+.page-header {
+  border-bottom: 1px solid var(--color-muted);
+  padding-bottom: 1.2rem;
+  margin-bottom: 2rem;
+}
 
-    
-    #panel-dish-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 1.2rem;
-    }
+.page-header h1 {
+  font-family: var(--font-title);
+  font-weight: 600;
+  font-size: 1.7rem;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
 
-    .dish-item-row {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 1rem 1.2rem;
-    border: 1px solid var(--color-fondo-secundario);
-    border-radius: 10px;
-    background-color: #fff;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .dish-item-row:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
+.page-header i {
+  color: var(--color-accent);
+  font-size: 1.8rem;
+}
 
-   
-    .dish-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    width: 100%;
-    }
-    .dish-info img {
-    width: 65px;
-    height: 65px;
-    border-radius: 10px;
-    object-fit: cover;
-    }
-    .dish-name-desc h6 {
-    margin: 0;
-    font-weight: 600;
-    color: var(--color-texto-principal);
-    }
-    .dish-name-desc p {
-    font-size: 0.85rem;
-    margin: 0;
-    color: var(--color-texto-secundario);
-    }
+/* --- BOTÓN AÑADIR PLATO --- */
+.page-header .btn-warning {
+  background-color: var(--color-accent);
+  border: none;
+  transition: all 0.2s ease-in-out;
+}
 
-   
-    .status-badge {
-    padding: 0.4em 0.9em;
-    border-radius: 50rem;
-    font-size: 0.8rem;
-    font-weight: 500;
-    }
-    .status-active {
-    background-color: var(--color-acento-verde);
-    color: #fff;
-    }
-    .status-inactive {
-    background-color: var(--color-fondo-secundario);
-    color: var(--color-texto-secundario);
-    }
+.page-header .btn-warning:hover {
+  background-color: #6c63ff;
+  transform: translateY(-2px);
+}
 
-    
-    .dish-actions {
-    align-self: flex-end;
-    margin-top: 0.8rem;
-    }
-    .dish-actions .btn {
-    margin-left: 0.5rem;
-    border-radius: 8px;
-    transition: all 0.2s ease-in-out;
-    }
-    .dish-actions .btn-secondary {
-    background-color: var(--color-fondo-secundario);
-    color: var(--color-texto-principal);
-    }
-    .dish-actions .btn-secondary:hover {
-    background-color: #d6dce1;
-    }
+/* --- GRID DE PLATOS --- */
+#panel-dish-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.5rem;
+}
 
-   
-    .modal-header { border-bottom: none; }
-    .modal-content { border-radius: 12px; }
-    .form-label {
-    color: var(--color-principal-oscuro);
-    font-weight: 500;
-    }
-    .form-control, .form-select {
-    border-radius: 8px;
-    border: 1px solid var(--color-fondo-secundario);
-    }
+/* --- TARJETAS DE PLATOS --- */
+.dish-item-row {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-muted);
+  border-radius: 12px;
+  padding: 1.2rem 1.4rem;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.25s ease;
+}
 
-    
-    #panel-dish-list::-webkit-scrollbar {
-    width: 6px;
-    }
-    #panel-dish-list::-webkit-scrollbar-thumb {
-    background-color: var(--color-principal-oscuro);
-    border-radius: 10px;
-    }
+.dish-item-row:hover {
+  border-color: var(--color-accent);
+  box-shadow: 0 6px 20px rgba(255, 140, 66, 0.15);
+  transform: translateY(-3px);
+}
+
+/* --- INFORMACIÓN DEL PLATO --- */
+.dish-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dish-info img {
+  width: 70px;
+  height: 70px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 2px solid var(--color-muted);
+}
+
+.dish-name-desc h6 {
+  font-family: var(--font-title);
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.dish-name-desc p {
+  font-size: 0.9rem;
+  color: var(--color-muted);
+  margin: 0.25rem 0 0 0;
+}
+
+/* --- BADGES DE ESTADO --- */
+.status-badge {
+  padding: 0.4em 0.9em;
+  border-radius: 50rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.status-active {
+  background-color: var(--color-primary);
+  color: #fff;
+}
+
+.status-inactive {
+  background-color: #d6dce1;
+  color: var(--color-muted);
+}
+
+/* --- ACCIONES --- */
+.dish-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.dish-actions .btn {
+  border-radius: 8px;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  padding: 0.4rem 0.7rem;
+}
+
+.dish-actions .btn-warning {
+  background-color: var(--color-accent);
+  border: none;
+  color: #fff;
+}
+
+.dish-actions .btn-warning:hover {
+  background-color: #3772ff;
+  transform: translateY(-2px);
+}
+
+.dish-actions .btn-secondary {
+  background-color: var(--color-muted);
+  border: none;
+  color: #fff;
+}
+
+.dish-actions .btn-secondary:hover {
+  background-color: #5c6b7e;
+}
+
+/* --- MODALES --- */
+.modal-content {
+  border-radius: 14px;
+  border: none;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+  border-bottom: 1px solid var(--color-muted);
+  background-color: var(--color-card);
+}
+
+.modal-title {
+  font-family: var(--font-title);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.form-label {
+  font-family: var(--font-body);
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.form-control, .form-select {
+  border-radius: 8px;
+  border: 1px solid var(--color-muted);
+  box-shadow: none;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 0.15rem rgba(255, 140, 66, 0.25);
+}
+
+/* --- SCROLLBAR --- */
+#panel-dish-list::-webkit-scrollbar {
+  width: 6px;
+}
+#panel-dish-list::-webkit-scrollbar-thumb {
+  background-color: var(--color-primary);
+  border-radius: 10px;
+}

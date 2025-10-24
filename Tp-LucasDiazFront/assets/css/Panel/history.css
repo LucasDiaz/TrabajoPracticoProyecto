@@ -1,76 +1,93 @@
+/* === HISTORIAL DE ÓRDENES - Ocean Fresh === */
 
+/* CONTENEDOR PRINCIPAL */
 .history-container {
-    background-color: #FFFFFF;
-    border-radius: 12px;
-    padding: 2rem;
-    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.05);
+  background-color: var(--color-card);
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+  border-left: 5px solid var(--color-primary);
 }
 
-.page-header {
-    border-bottom: 1px solid var(--color-fondo-secundario);
-    padding-bottom: 1.5rem;
-    margin-bottom: 1.5rem;
+/* TÍTULO */
+.page-title {
+  font-family: var(--font-title);
+  font-weight: 600;
+  color: var(--color-secondary);
+  border-bottom: 3px dashed var(--color-accent);
+  display: inline-block;
+  padding-bottom: 0.4rem;
+  margin-bottom: 1.5rem;
 }
 
-.page-header h1 {
-    font-weight: 400;
-}
-
-
+/* FILTROS DE FECHA */
 .filter-bar {
-    background-color: var(--color-fondo-principal);
-    border: 1px solid var(--color-fondo-secundario);
-    border-radius: 8px;
-    padding: 1rem 1.5rem;
-    margin-bottom: 2rem;
+  background-color: #e9f3ff;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  border: 1px solid rgba(55, 114, 255, 0.2);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.03);
 }
 
 .filter-bar .form-label {
-    font-family: var(--font-principal);
-    font-weight: 500;
-    color: var(--color-texto-secundario);
+  font-weight: 600;
+  color: var(--color-muted);
 }
 
+.filter-bar .form-control {
+  border: 2px solid var(--color-secondary);
+  border-radius: 10px;
+}
+.filter-bar .form-control:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 5px var(--color-accent);
+}
+.filter-bar .btn-primary {
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+}
+.filter-bar .btn-primary:hover {
+  background-color: var(--color-secondary);
+}
 
+/* TARJETA DE CADA ORDEN */
 .order-card-history {
-    background-color: #FFFFFF;
-    border: 1px solid var(--color-fondo-secundario);
-    border-radius: 8px;
-    padding: 1.25rem;
-    transition: all 0.2s ease-in-out;
-    margin-bottom: 1rem;
+  background-color: var(--color-card);
+  border-radius: 14px;
+  padding: 1.5rem;
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 3px 12px rgba(0,0,0,0.04);
+  transition: 0.3s ease;
 }
-
 .order-card-history:hover {
-    border-color: var(--color-acento-oro);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(55, 114, 255, 0.15);
 }
 
 .order-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
 }
-
-.order-card-header .order-title {
-    font-family: var(--font-principal);
-    font-weight: 500;
-    font-size: 1.2rem;
-    margin: 0;
+.order-title {
+  font-family: var(--font-title);
+  font-weight: 500;
+  color: var(--color-primary);
 }
-
 .order-card-info {
-    font-size: 0.9rem;
-    color: var(--color-texto-secundario);
-    margin-top: 0.25rem;
+  font-size: 0.9rem;
+  color: var(--color-muted);
 }
 
+/* BADGE DE ESTADO */
 .order-card-history .badge {
-    background-color: var(--color-principal-oscuro) !important;
-    color: #FFFFFF !important;
-    font-size: 0.8rem;
-    font-weight: 500;
-    padding: 0.4em 0.8em;
+  background-color: var(--color-accent);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0.4em 0.8em;
 }

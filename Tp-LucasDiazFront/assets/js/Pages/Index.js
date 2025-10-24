@@ -8,7 +8,7 @@ import { getDeliveryTypes } from '../APIs/DeliveryTypeApi.js';
 import { renderCategories } from '../Components/renderCategories.js';
 import { renderDishes } from '../Components/renderDishes.js';
 import { renderCart, renderDeliveryTypes } from '../Components/renderCart.js';
-
+import { renderActiveOrders } from '../Components/renderMyOrders.js';
 
 import { initFilters } from '../Handlers/Menu/filterHandler.js';
 import { initCartHandlers } from '../Handlers/Menu/cartHandler.js';

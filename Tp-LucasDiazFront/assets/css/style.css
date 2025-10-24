@@ -1,76 +1,51 @@
-
+/* === GENERAL STYLE - Ocean Fresh === */
 :root {
-    --color-fondo-principal: #F8F9FA;
-    --color-fondo-secundario: #E9ECEF;
-    --color-principal-oscuro: #343A40;
-    --color-acento-oro: #D4AF37;
-    --color-acento-verde: #28A745;
-    --color-texto-principal: #212529;
-    --color-texto-secundario: #6c757d;
-    
-   
-    --font-principal: 'Montserrat', sans-serif;
-    --font-secundaria: 'Lato', sans-serif;
-}
+  --color-bg: #f0f7ff;
+  --color-card: #ffffff;
+  --color-primary: #3772ff;
+  --color-secondary: #6c63ff;
+  --color-accent: #ff8c42;
+  --color-text: #1a1a1a;
+  --color-muted: #7c8b9e;
 
+  --font-title: 'Poppins', sans-serif;
+  --font-body: 'Rubik', sans-serif;
+}
 
 body {
-    background-color: var(--color-fondo-principal);
-    color: var(--color-texto-principal);
-    font-family: var(--font-secundaria);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
 }
 
-h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-principal);
-    color: var(--color-principal-oscuro);
-    font-weight: 300;
-}
-
-
-.navbar.bg-dark {
-    background-color: var(--color-principal-oscuro) !important;
-    padding: 0.5rem 0;
-}
-.navbar-brand {
-    padding-top: 0;
-    padding-bottom: 0;
+/* NAVBAR */
+.navbar {
+  border-bottom: 2px solid rgba(55, 114, 255, 0.1);
 }
 .navbar-logo {
-    height: 80px;
+  height: 55px;
 }
-.navbar .nav-link, .navbar .btn {
-    font-family: var(--font-principal);
-    font-weight: 400;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-size: 0.9rem;
+.navbar .nav-link {
+  color: var(--color-muted);
+  font-weight: 500;
+  transition: color 0.3s;
+}
+.navbar .nav-link:hover {
+  color: var(--color-accent);
 }
 .navbar .nav-link.active {
-    color: var(--color-acento-oro) !important;
+  color: var(--color-primary) !important;
+}
+.btn-outline-primary {
+  border-radius: 12px;
+  font-weight: 500;
 }
 
-
-#notification-modal .modal-title {
-    font-family: var(--font-principal);
-    font-weight: 500;
+/* MODALES */
+.modal-content {
+  border-radius: 1rem;
 }
-
-
-#notification-modal .modal-header.text-white .modal-title {
-    color: #FFFFFF; 
-}
-
-
-#cart-button {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%; 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#cart-button .badge {
-   
-    transform: translate(-30%, -30%);
+.modal-header {
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
 }

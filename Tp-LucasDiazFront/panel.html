@@ -8,77 +8,77 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/Panel/panel.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/Panel/panel.css">
 </head>
 <body>
-    <nav class="navbar navbar-black bg-black">
-    <div class="container-fluid bg-black px-4">
-        <a class="navbar-brand d-flex align-items-center" href="panel.html">
-                <img src="../assets/imag/Restaurant.png" alt="Mi Restaurante Logo" class="navbar-logo">
-                <span class="fw-semibold text-light">Mi Restaurante</span>
-                
+    <nav class="navbar navbar-expand-lg bg-white sticky-top shadow-sm">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand d-flex align-items-center" href="panel.html">
+                <img src="https://i.ibb.co/7xNR4bR0/Sin-t-tulo-Folleto-A4-con-doblez-en-el-medio-420-mm-x-297-mm-.png" alt="Mi Restaurante Logo" class="navbar-logo">
+                <span class="fw-semibold text-dark ms-2">Mi Restaurante</span> 
             </a>
             
-        <div class="d-flex align-items-center">
-            <a href="./index.html" class="btn btn-outline-warning me-3">
-            <i class="bi bi-shop"></i> Ir al Menú
-            </a>
-            <div class="navbar-nav d-flex flex-row">
-            <a class="nav-link px-2 active" href="./panel.html"><i class="bi bi-grid"></i> Panel</a>
-            <a class="nav-link px-2 text-white " href="./menu-admin.html"><i class="bi bi-card-list "></i> Menú</a>
-            
+            <div class="d-flex align-items-center">
+                <a href="index.html" class="btn btn-outline-primary me-3">
+                <i class="bi bi-shop"></i> Ir al Menú
+                </a>
+                <div class="navbar-nav d-flex flex-row">
+                <a class="nav-link px-2 active" href="panel.html"><i class="bi bi-grid"></i> Panel</a>
+                <a class="nav-link px-2" href="menu-admin.html"><i class="bi bi-card-list"></i> Menú</a>
+                <a class="nav-link px-2" href="history.html"><i class="bi bi-clock-history"></i> Historial</a>
+                </div>
             </div>
         </div>
     </nav>
+
     <main class="container-fluid py-4 px-4">
-        <div class="row g-4">
-        <div class="col-lg-4 col-md-6">
+    <div class="panel-layout-vertical"> 
+        
+        <div class="col-12 mb-4">
             <div class="panel-column">
-            <h3><i class="bi bi-hourglass-split text-warning"></i> Pendiente</h3>
-            <div id="orders-pending" class="orders-container"></div>
+                <h3><i class="bi bi-ticket-fill"></i> Pendientes</h3>
+                <div id="orders-pending" class="orders-container horizontal-scroll"></div>
             </div>
         </div>
 
-        <div class="col-lg-4 col-md-6">
+        <div class="col-12 mb-4">
             <div class="panel-column">
-            <h3><i class="bi bi-fire text-danger"></i> En Preparación</h3>
-            <div id="orders-preparing" class="orders-container"></div>
+                <h3><i class="bi bi-gear-wide-connected"></i> Preparando</h3>
+                <div id="orders-preparing" class="orders-container horizontal-scroll"></div>
             </div>
         </div>
 
-        <div class="col-lg-4 col-md-12">
+        <div class="col-12 mb-4">
             <div class="panel-column">
-            <h3><i class="bi bi-check-circle text-success"></i> Listo para Entregar</h3>
-            <div id="orders-ready" class="orders-container"></div>
+                <h3><i class="bi bi-hand-thumbs-up-fill"></i> Listo para Entregar</h3>
+                <div id="orders-ready" class="orders-container horizontal-scroll"></div>
             </div>
         </div>
-        </div>
-    </main>
 
-    <!-- MODAL DETALLES -->
+    </div>
+</main>
     <div class="modal fade" id="order-details-modal" tabindex="-1">
         <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-white text-white">
+            <div class="modal-header bg-light">
             <h5 class="modal-title" id="modal-order-number"></h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" id="modal-order-body"></div>
             <div class="modal-footer bg-light">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-            <button type="button" class="btn btn-warning text-dark fw-semibold" id="save-changes-btn">Guardar Cambios</button>
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <button type="button" class="btn btn-warning" id="save-changes-btn">Guardar Cambios</button>
             </div>
         </div>
         </div>
     </div>
 
-    <!-- MODAL AGREGAR PLATOS -->
     <div class="modal fade" id="add-dishes-modal" tabindex="-1">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-dark text-white">
+            <div class="modal-header bg-primary text-white">
             <h5 class="modal-title"><i class="bi bi-plus-circle"></i> Agregar Platos</h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -87,7 +87,7 @@
             </div>
             <div class="modal-footer bg-light">
             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button type="button" class="btn btn-success fw-semibold" id="confirm-dishes-btn">Volver a la Orden</button>
+            <button type="button" class="btn btn-primary" id="confirm-dishes-btn">Volver a la Orden</button>
             </div>
         </div>
         </div>
@@ -96,7 +96,7 @@
     <div class="modal fade" id="notification-modal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
-            <div class="modal-header text-white" id="notification-modal-header">
+            <div class="modal-header bg-primary text-white" id="notification-modal-header">
                 <h5 class="modal-title" id="notification-modal-title"></h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
@@ -110,6 +110,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script type="module" src="../assets/js/Pages/panel.js"></script>
+    <script type="module" src="assets/js/Pages/panel.js"></script>
     </body>
     </html>

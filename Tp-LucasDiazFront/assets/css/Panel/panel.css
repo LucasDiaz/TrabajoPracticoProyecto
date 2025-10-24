@@ -1,100 +1,187 @@
-    :root {
-    --color-fondo-principal: #F8F9FA;
-    --color-fondo-secundario: #E9ECEF;
-    --color-principal-oscuro: #343A40;
-    --color-acento-oro: #D4AF37;
-    --color-acento-verde: #28A745;
-    --color-acento-rojo: #DC3545;
-    --color-texto-principal: #212529;
-    --color-texto-secundario: #6C757D;
-    --color-texto-detalle: #F8F9FA;
-    }
+/* --- ESTRUCTURA DE PANEL - Ocean Fresh Kitchen Board --- */
 
-   .panel-column {
-    background-color: #fff;
-    border-radius: 12px;
+/* Reemplazamos las variables locales por las del style.css */
+/* Si este archivo se carga después de style.css, podemos basarnos en ellas,
+   pero definimos un nuevo conjunto de variables para colores de estado específicos
+   que no están en el :root principal. */
+:root {
+    --color-panel-fondo: var(--color-bg); /* #f0f7ff */
+    --color-columna-bg: var(--color-card); /* #ffffff */
+    --color-sombra-suave: 0 8px 30px rgba(55, 114, 255, 0.1);
+    
+    /* Colores de estado basados en la paleta Ocean Fresh */
+    --color-pendiente: var(--color-accent); /* Naranja: #ff8c42 */
+    --color-preparacion: var(--color-primary); /* Azul: #3772ff */
+    --color-listo: #28a745; /* Verde Bootstrap/Fresh */
+}
+
+/* --- CONTENEDOR DE COLUMNAS (La estructura principal de cada estado) --- */
+.panel-column {
+    background-color: var(--color-columna-bg);
+    border-radius: 16px; 
     padding: 1.5rem;
-    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.07);
-    height: calc(100vh - 180px);
+    box-shadow: var(--color-sombra-suave);
+    
+    /* MODIFICACIÓN CLAVE 1: Eliminamos la altura fija y establecemos una altura mínima */
+    /* Eliminado: height: calc(100vh - 180px); */
+    min-height: 150px; /* La columna empieza pequeña y crece con el contenido */
+    
     display: flex;
     flex-direction: column;
-    }
+    border: 1px solid rgba(55, 114, 255, 0.1); 
+    transition: all 0.3s ease;
+}
 
-    .panel-column h3 {
-    font-family: "Montserrat", sans-serif;
-    font-weight: 600;
-    font-size: 1.05rem;
-    text-transform: uppercase;
-    color: var(--color-principal-oscuro);
-    border-bottom: 2px solid var(--color-acento-oro);
+.panel-column:hover {
+    box-shadow: 0 10px 40px rgba(55, 114, 255, 0.2);
+}
+
+/* --- TÍTULOS DE SECCIÓN (Más prominentes y minimalistas) --- */
+.panel-column h3 {
+    font-family: var(--font-title);
+    font-weight: 700;
+    font-size: 1.4rem;
+    text-transform: none;
+    color: var(--color-text);
+    border-bottom: 2px solid var(--color-muted); 
     padding-bottom: 0.75rem;
     margin-bottom: 1rem;
-    text-align: center;
-    letter-spacing: 1px;
-    }
+    text-align: left;
+    letter-spacing: normal;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
 
-  
-    .orders-container {
-    overflow-y: auto;
-    padding-right: 0.5rem;
-    flex-grow: 1;
-    }
-    .orders-container::-webkit-scrollbar {
-    width: 6px;
-    }
-    .orders-container::-webkit-scrollbar-thumb {
-    background: var(--color-principal-oscuro);
-    border-radius: 10px;
-    }
+/* Colores de íconos en los títulos */
+.panel-column h3 i.bi-hourglass-split { color: var(--color-pendiente); }
+.panel-column h3 i.bi-fire { color: var(--color-preparacion); }
+.panel-column h3 i.bi-check-circle { color: var(--color-listo); }
 
+/* --- CONTENEDOR DE ÓRDENES (Ahora solo enfocado en el scroll horizontal) --- */
+.orders-container {
+    /* MODIFICACIÓN CLAVE 2: Adaptamos las propiedades para Flexbox horizontal */
+    /* Eliminado: overflow-y: auto; */
+    /* Eliminado: flex-grow: 1; */
     
-    .order-card-panel {
-    background-color: var(--color-fondo-principal);
-    border: 1px solid var(--color-fondo-secundario);
+    padding-right: 0.5rem; /* Mantenemos este padding para el scrollbar */
+    display: flex; /* Alinea los elementos (tarjetas) horizontalmente */
+    gap: 1.5rem;   /* Espacio entre tarjetas */
+    flex-wrap: nowrap; /* Asegura que las tarjetas se mantengan en una sola línea */
+}
+.orders-container::-webkit-scrollbar {
+    width: 6px; /* Solo afecta al scroll vertical, pero lo mantenemos para consistencia */
+}
+.orders-container::-webkit-scrollbar-thumb {
+    background: var(--color-primary);
     border-radius: 10px;
-    transition: all 0.2s ease-in-out;
-    }
-    .order-card-panel:hover {
-    box-shadow: 0 3px 10px rgba(52, 58, 64, 0.15);
-    transform: scale(1.02);
-    }
-    .order-card-panel .card-header {
-    background-color: var(--color-fondo-secundario);
-    font-weight: 500;
-    border-bottom: none;
-    }
-    .order-card-panel .list-group-item {
+}
+.orders-container::-webkit-scrollbar-track {
+    background: var(--color-bg);
+}
+
+/* ESTILO CLAVE: Permite el desplazamiento horizontal */
+.horizontal-scroll {
+    overflow-x: auto; /* Habilita el scroll horizontal */
+    overflow-y: hidden; /* Oculta el scroll vertical */
+    padding-bottom: 1rem; 
+}
+
+/* Modificación para las tarjetas dentro del scroll horizontal */
+.order-card-panel {
+    min-width: 320px; /* Le da un ancho fijo a la tarjeta para que se pueda hacer scroll */
+    /* El resto de estilos se mantienen */
+}
+
+/* --- TARJETAS DE ÓRDENES (Ligeras y con acento en el borde) --- */
+.order-card-panel {
+    background-color: var(--color-fondo-principal);
+    border: 1px solid var(--color-muted);
+    border-left: 5px solid transparent; 
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    margin-bottom: 1rem;
+}
+
+.order-card-panel:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+/* Variaciones del borde izquierdo para el estado (simula un Kanban) */
+.order-card-panel[data-status="pendiente"] {
+    border-left-color: var(--color-pendiente);
+}
+.order-card-panel[data-status="preparacion"] {
+    border-left-color: var(--color-preparacion);
+}
+.order-card-panel[data-status="listo"] {
+    border-left-color: var(--color-listo);
+}
+
+.order-card-panel .card-header {
+    background-color: transparent;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--color-primary);
+    border-bottom: 1px solid var(--color-muted); 
+    padding: 0.75rem 1rem;
+}
+
+.order-card-panel .list-group-item {
     border: none;
-    border-top: 1px solid var(--color-fondo-secundario);
-    }
+    border-top: 1px dashed rgba(124, 139, 158, 0.3); 
+    padding: 0.5rem 1rem;
+}
 
-
-    .status-action-btn {
+/* --- BOTONES DE ACCIÓN (Fuera de las tarjetas) --- */
+.order-action-btn {
+    background-color: var(--color-primary);
+    color: #fff;
+    border: none;
     border-radius: 8px;
     font-weight: 500;
     transition: 0.2s ease;
-    }
-    .status-action-btn.btn-warning {
-    background-color: #fff3cd;
-    color: #856404;
-    }
-    .status-action-btn.btn-success {
-    background-color: #d4edda;
-    color: #155724;
-    }
-    .status-action-btn:hover {
-    opacity: 0.9;
-    transform: scale(1.03);
-    }
+}
+.order-action-btn:hover {
+    background-color: #2b61dc;
+    transform: translateY(-1px);
+}
 
-  
-    .order-action-btn {
-    background-color: var(--color-principal-oscuro);
-    color: #fff;
-    border: none;
-    transition: 0.2s ease;
-    }
-    .order-action-btn:hover {
-    background-color: var(--color-acento-oro);
-    color: var(--color-principal-oscuro);
-    }
+/* --- ESTILOS DENTRO DEL MODAL DE DETALLES --- */
+.modal-details-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--color-muted);
+}
+.modal-details-item:last-child {
+    border-bottom: none;
+}
+.modal-details-item strong {
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
+/* Botones del modal: Reemplazamos warning por accent para Guardar Cambios */
+.modal-footer .btn-warning {
+    background-color: var(--color-accent) !important;
+    border-color: var(--color-accent) !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    border-radius: 8px;
+}
+.modal-footer .btn-warning:hover {
+    background-color: #e57e3c !important; 
+    border-color: #e57e3c !important;
+}
+
+/* Botón de Agregar Platos */
+#confirm-dishes-btn {
+    background-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    border-radius: 8px;
+}
+#confirm-dishes-btn:hover {
+    background-color: #2b61dc !important;
+}
